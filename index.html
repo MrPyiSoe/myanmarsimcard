@@ -1,35 +1,42 @@
 <!DOCTYPE html>
 <html lang="my">
 <head>
-  <meta charset="UTF-8"> <!-- မြန်မာစာ မှန်ကန်စေရန် -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ဖုန်းနှင့်ကြည့်လျှင် အချိုးအစားမှန်စေရန် -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Myanmar Simcard</title>
+  
+  <!-- Google ကနေ မြန်မာစာဖောင့်ကို တိုက်ရိုက် လှမ်းယူမည့် Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;700&display=swap" rel="stylesheet">
+
   <style>
     body {
       margin: 0;
       height: 100vh;
       background-color: #050505; 
       background-image: 
-        radial-gradient(circle at 50% 50%, rgba(0, 150, 255, 0.15) 0%, transparent 60%),
+        radial-gradient(circle at 50% 50%, rgba(0, 150, 255, 0.15 ) 0%, transparent 60%),
         linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
       background-size: 100% 100%, 35px 35px, 35px 35px;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-family: 'Pyidaungsu', 'Padauk', 'Myanmar Text', sans-serif; /* မြန်မာစာ ဖောင့်များ */
+      /* Google Font ကို အသုံးပြုရန် သတ်မှတ်ခြင်း */
+      font-family: 'Noto Sans Myanmar', sans-serif; 
     }
 
     .header-container {
       position: absolute;
       top: 50px; 
       text-align: center; 
-      width: 100%; /* ဖုန်းတွင် အလယ်တည့်တည့်ဖြစ်စေရန် */
+      width: 100%; 
     }
 
     .top-title {
       color: white; 
-      font-size: 32px; /* ဖုန်းနှင့်အဆင်ပြေစေရန် အနည်းငယ် ပြင်ထားသည် */
+      font-size: 32px; 
       font-weight: bold; 
       letter-spacing: 2px; 
       margin-bottom: 10px; 
