@@ -64,6 +64,50 @@ export default async function handler(req, res) {
                   'Accept': 'application/vnd.github.v3+json'
                 }
               } );
+              
               if (getRes.ok) {
                 const fileData = await getRes.json();
-                const content = Buffer.from(fileData.content, 'base64').toString('
+                const content = Buffer.from(fileData.content, 'base64').toString('utf8');
+                let json = JSON.parse(content);
+
+                // ပယ်ဖျက်လိုက်သော နံပါတ်များကို JSON အဟောင်းထဲသို့ ပြန်ပေါင်းထည့်ခြင်း
+                json = [...json, ...itemsToAdd];
+
+                const newContent = Buffer.from(JSON.stringify(json, null, 2)).toString('base64');
+                
+                await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${file}`, {
+                  method: 'PUT',
+                  headers: {
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                  },
+                  body: JSON.stringify({
+                    message: `Restored cancelled numbers: ${itemsToAdd.map(i => i.number ).join(', ')}`,
+                    content: newContent,
+                    sha: fileData.sha
+                  })
+                });
+              }
+            } catch (e) {
+              console.error("GitHub Restore Error:", e);
+            }
+          }));
+        }
+
+        // Telegram မက်ဆေ့ချ်ကို ပယ်ဖျက်ကြောင်း ပြောင်းလဲခြင်း
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/editMessageText`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            message_id: messageId,
+            text: text + "\n\n❌ ဤအော်ဒါကို ပယ်ဖျက်လိုက်ပါပြီ။ (နံပါတ်များကို ဝဘ်ဆိုက်သို့ ပြန်လည်ထည့်သွင်းပေးလိုက်ပါပြီ )"
+          })
+        });
+        return res.status(200).send('OK');
+      }
+    }
+    return res.status(200).send('OK');
+  }
+  res.status(405).send('Method Not Allowed');
+}
