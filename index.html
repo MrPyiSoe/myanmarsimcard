@@ -6,23 +6,33 @@
     body {
       margin: 0;
       height: 100vh;
-      /* အလွန်ရင့်သော အမည်းရောင် နောက်ခံ */
       background-color: #050505; 
-      
-      /* ဆက်သွယ်ရေး (Network/Data) ပုံစံ ခေတ်မီ Grid လိုင်းများနှင့် အလင်းရောင် */
       background-image: 
         radial-gradient(circle at 50% 50%, rgba(0, 150, 255, 0.15) 0%, transparent 60%),
         linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
       background-size: 100% 100%, 35px 35px, 35px 35px;
-      
       display: flex;
       justify-content: center;
       align-items: center;
+      font-family: Arial, sans-serif; /* စာလုံးဖောင့်ပုံစံ */
+    }
+
+    /* အပေါ်ဆုံးက စာသားအတွက် ဒီဇိုင်း */
+    .top-title {
+      position: absolute;
+      top: 50px; /* အပေါ်ဘက်မှ အကွာအဝေး */
+      color: white; /* စာလုံးအရောင် အဖြူ */
+      font-size: 36px; /* စာလုံးအရွယ်အစား */
+      font-weight: bold; /* စာလုံးအထူ */
+      letter-spacing: 2px; /* စာလုံးများကြား အကွာအဝေး */
     }
   </style>
 </head>
 <body>
+
+  <!-- အပေါ်ဆုံးက စာသား -->
+  <div class="top-title">mmbsim.com</div>
 
 </body>
 </html>
