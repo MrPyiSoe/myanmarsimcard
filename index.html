@@ -64,6 +64,7 @@
       border-radius: 20px; 
       box-shadow: 0 10px 30px rgba(0, 150, 255, 0.3); 
       transition: transform 0.3s ease; 
+      cursor: pointer; 
     }
 
     .center-image:hover {
@@ -83,8 +84,8 @@
     .delivery-track {
       position: absolute;
       bottom: 30px; 
-      width: 90%; /* မျက်နှာပြင်၏ ၉၀% အထိ အပြည့်ယူမည် */
-      max-width: 1200px; /* PC တွင် အစွန်းနှစ်ဖက်ထိ ဆန့်ထွက်ရန် ပြင်ဆင်ထားသည် */
+      width: 90%; 
+      max-width: 1200px; 
       height: 40px;
       display: flex;
       justify-content: space-between;
@@ -106,7 +107,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      animation: drive 6s linear infinite; /* လမ်းကြောင်းရှည်သွားသဖြင့် ၅ စက္ကန့်မှ ၆ စက္ကန့်သို့ အနည်းငယ် ပြင်ထားသည် */
+      animation: drive 6s linear infinite; 
       z-index: 1;
     }
 
@@ -125,6 +126,97 @@
       85% { opacity: 1; }
       100% { left: calc(100% - 70px); opacity: 0; }
     }
+
+    /* Popup Box (Modal) အတွက် ဒီဇိုင်း */
+    .modal-overlay {
+      display: none; 
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 400px;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 20px;
+      box-shadow: 0 10px 40px rgba(0, 150, 255, 0.2);
+      position: relative;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px; right: 20px;
+      color: #aaa;
+      font-size: 24px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .close-btn:hover { color: white; }
+
+    .modal-title {
+      color: white;
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 22px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 10px;
+    }
+
+    .number-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1a1a1a;
+      padding: 12px 15px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      border: 1px solid #222;
+    }
+
+    .num-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .num-text {
+      color: #0096ff;
+      font-size: 18px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .price-text {
+      color: #e0e0e0;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .buy-btn {
+      background: linear-gradient(45deg, #0096ff, #005bb5);
+      color: white;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .buy-btn:hover {
+      background: linear-gradient(45deg, #005bb5, #003f80);
+      box-shadow: 0 0 10px rgba(0, 150, 255, 0.5);
+    }
   </style>
 </head>
 <body>
@@ -141,9 +233,12 @@
     <a href="https://mmbsim.com/atom-2/">
       <img src="ATOM.png" alt="ATOM Simcard" class="center-image">
     </a>
-    <a href="https://mmbsim.com/ooredoo/">
-      <img src="U9.png" alt="Ooredoo Simcard" class="center-image">
+    
+    <!-- U9 ပုံကို နှိပ်လျှင် Popup ပေါ်စေရန် ပြင်ဆင်ထားသည် (Ooredoo အစား U9 ဟု ပြောင်းထားသည် ) -->
+    <a href="#" onclick="showNumbers('ooredoo.json', 'U9', event)">
+      <img src="U9.png" alt="U9 Simcard" class="center-image">
     </a>
+
     <a href="https://mmbsim.com/mytel/">
       <img src="MYTEL.png" alt="Mytel Simcard" class="center-image">
     </a>
@@ -151,10 +246,7 @@
 
   <!-- Delivery Animation HTML -->
   <div class="delivery-track">
-    <!-- ဘယ်ဘက် -->
     <div class="track-icon">🏪</div>
-    
-    <!-- ရွေ့လျားနေမည့် ကားနှင့် စာသား -->
     <div class="car-container">
       <span class="car-text">Cash on Delivery</span>
       <svg width="35" height="22" viewBox="0 0 40 25" xmlns="http://www.w3.org/2000/svg">
@@ -165,10 +257,76 @@
         <circle cx="31" cy="19" r="4" fill="#ffffff"/>
       </svg>
     </div>
-
-    <!-- ညာဘက် -->
     <div class="track-icon">🏠</div>
   </div>
+
+  <!-- Popup Box (Modal ) HTML -->
+  <div id="numberModal" class="modal-overlay">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <h2 id="modalTitle" class="modal-title">ဖုန်းနံပါတ်များ</h2>
+      <div id="numberList">
+        <!-- JSON မှ ဒေတာများ ဤနေရာတွင် အလိုအလျောက် ဝင်လာမည် -->
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript (JSON ကိုဖတ်ရန်နှင့် Popup ပြရန်) -->
+  <script>
+    async function showNumbers(jsonFile, operatorName, event) {
+      event.preventDefault(); 
+      
+      const modal = document.getElementById('numberModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const numberList = document.getElementById('numberList');
+
+      modalTitle.innerText = operatorName + " ဖုန်းနံပါတ်များ";
+      numberList.innerHTML = '<p style="color: #aaa; text-align: center;">ခဏစောင့်ပါ...</p>';
+      modal.style.display = 'flex'; 
+
+      try {
+        const response = await fetch(jsonFile);
+        const data = await response.json();
+        
+        numberList.innerHTML = ''; 
+        
+        if(data.length === 0) {
+           numberList.innerHTML = '<p style="color: #aaa; text-align: center;">နံပါတ်များ မရှိသေးပါ</p>';
+           return;
+        }
+
+        data.forEach(item => {
+          const row = document.createElement('div');
+          row.className = 'number-row';
+          
+          const message = encodeURIComponent(`မင်္ဂလာပါ၊ ${item.number} (${item.price}) ကို ဝယ်ယူလိုပါတယ်။`);
+          const buyLink = `https://m.me/YOUR_PAGE_ID?text=${message}`;
+
+          row.innerHTML = `
+            <div class="num-info">
+              <span class="num-text">${item.number}</span>
+              <span class="price-text">${item.price}</span>
+            </div>
+            <a href="${buyLink}" target="_blank" class="buy-btn">Buy</a>
+          `;
+          numberList.appendChild(row );
+        });
+      } catch (error) {
+        numberList.innerHTML = '<p style="color: #ff4444; text-align: center;">ဒေတာ ယူရာတွင် အမှားအယွင်းဖြစ်နေပါသည်</p>';
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('numberModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('numberModal');
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+  </script>
 
 </body>
 </html>
