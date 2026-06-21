@@ -309,9 +309,13 @@
       box-shadow: 0 0 15px rgba(40, 167, 69, 0.5);
     }
 
-    /* =========================================
-       Customer Form (အချက်အလက်ဖြည့်ရန်) ဒီဇိုင်း
-       ========================================= */
+    .checkout-btn:disabled {
+      background: #555;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* Customer Form (အချက်အလက်ဖြည့်ရန်) ဒီဇိုင်း */
     .form-group {
       margin-bottom: 15px;
     }
@@ -421,7 +425,7 @@
     </div>
   </div>
 
-  <!-- အချက်အလက်ဖြည့်ရန် Popup Box (အသစ်) -->
+  <!-- အချက်အလက်ဖြည့်ရန် Popup Box -->
   <div id="checkoutModal" class="modal-overlay">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal('checkoutModal')">&times;</span>
@@ -442,7 +446,7 @@
         <textarea id="customerAddress" class="form-input" rows="3" placeholder="မြို့၊ မြို့နယ်၊ လမ်း၊ အိမ်အမှတ်"></textarea>
       </div>
       
-      <button class="checkout-btn" onclick="confirmOrder()">အော်ဒါတင်မည်</button>
+      <button id="submitOrderBtn" class="checkout-btn" onclick="confirmOrder()">အော်ဒါတင်မည်</button>
     </div>
   </div>
 
@@ -535,29 +539,33 @@
       showCartModal(); 
     }
 
-    // Checkout နှိပ်လျှင် Form Box ပေါ်လာစေရန်
     function openCheckoutForm() {
       if (cart.length === 0) {
         alert("ခြင်းတောင်းထဲတွင် ပစ္စည်းမရှိသေးပါ။");
         return;
       }
-      closeModal('cartModal'); // ခြင်းတောင်းကို ပိတ်မည်
-      document.getElementById('checkoutModal').style.display = 'flex'; // Form ကို ဖွင့်မည်
+      closeModal('cartModal'); 
+      document.getElementById('checkoutModal').style.display = 'flex'; 
     }
 
-    // အော်ဒါတင်မည် နှိပ်လျှင် Messenger သို့ ပို့မည့် စနစ်
+    // ==========================================
+    // Telegram သို့ တိုက်ရိုက်ပို့မည့် စနစ် (API)
+    // ==========================================
     function confirmOrder() {
       const name = document.getElementById('customerName').value.trim();
       const phone = document.getElementById('customerPhone').value.trim();
       const address = document.getElementById('customerAddress').value.trim();
 
-      // အချက်အလက် အကုန်မဖြည့်ထားလျှင် သတိပေးမည်
       if (!name || !phone || !address) {
         alert("ကျေးဇူးပြု၍ အမည်၊ ဖုန်းနံပါတ် နှင့် လိပ်စာကို ပြည့်စုံစွာ ဖြည့်ပေးပါ။");
         return;
       }
 
-      let message = "မင်္ဂလာပါ၊ အောက်ပါ ဖုန်းနံပါတ်များကို ဝယ်ယူလိုပါတယ်-\n\n";
+      // ၁။ အောက်ပါ နေရာနှစ်ခုတွင် အစ်ကို့ရဲ့ Bot Token နှင့် Chat ID ကို ထည့်ပါ
+      const botToken = 'YOUR_BOT_TOKEN'; 
+      const chatId = 'YOUR_CHAT_ID';     
+
+      let message = "📦 အော်ဒါအသစ် ရောက်ရှိပါသည်\n\n";
       cart.forEach(item => {
         message += `✅ ${item.number} (${item.price})\n`;
       });
@@ -568,17 +576,44 @@
       message += `📞 ဖုန်း: ${phone}\n`;
       message += `🏠 လိပ်စာ: ${address}`;
 
-      // YOUR_PAGE_ID နေရာတွင် အစ်ကို့ Page ID သို့မဟုတ် Username ထည့်ပါ
-      const buyLink = `https://m.me/YOUR_PAGE_ID?text=${encodeURIComponent(message )}`;
-      window.open(buyLink, '_blank');
+      const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+      
+      // ခလုတ်ကို "ပို့ဆောင်နေပါသည်..." ဟု ပြောင်းမည်
+      const btn = document.getElementById('submitOrderBtn' );
+      btn.innerText = 'ပို့ဆောင်နေပါသည်...';
+      btn.disabled = true;
 
-      // အော်ဒါတင်ပြီးပါက Form ကိုပိတ်ပြီး ခြင်းတောင်းကို ရှင်းလင်းမည်
-      closeModal('checkoutModal');
-      cart = [];
-      document.getElementById('cartBadge').innerText = '0';
-      document.getElementById('customerName').value = '';
-      document.getElementById('customerPhone').value = '';
-      document.getElementById('customerAddress').value = '';
+      // Telegram သို့ နောက်ကွယ်မှ လှမ်းပို့ခြင်း
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: message
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if(data.ok) {
+          alert("အော်ဒါတင်ခြင်း အောင်မြင်ပါသည်။ မကြာမီ ဆက်သွယ်ပေးပါမည်။");
+          closeModal('checkoutModal');
+          cart = [];
+          document.getElementById('cartBadge').innerText = '0';
+          document.getElementById('customerName').value = '';
+          document.getElementById('customerPhone').value = '';
+          document.getElementById('customerAddress').value = '';
+        } else {
+          alert("အော်ဒါတင်ရာတွင် အမှားအယွင်းဖြစ်နေပါသည်။ (Token နှင့် Chat ID ကို စစ်ဆေးပါ)");
+        }
+      })
+      .catch(error => {
+        alert("အင်တာနက် ချိတ်ဆက်မှု စစ်ဆေးပေးပါ။");
+      })
+      .finally(() => {
+        // ခလုတ်ကို မူလအတိုင်း ပြန်ထားမည်
+        btn.innerText = 'အော်ဒါတင်မည်';
+        btn.disabled = false;
+      });
     }
 
     function closeModal(modalId) {
