@@ -49,9 +49,18 @@
       line-height: 1.5;
     }
 
-    /* အလယ်က ပုံအတွက် ဒီဇိုင်း (အသစ်ထပ်တိုးထားသည်) */
+    /* ပုံများ ဘေးတိုက်ပေါ်စေရန် စုထားမည့် နေရာ (အသစ်) */
+    .image-container {
+      display: flex;
+      gap: 20px; /* ပုံနှစ်ပုံကြား အကွာအဝေး */
+      justify-content: center;
+      align-items: center;
+      margin-top: 80px; /* အပေါ်စာသားများနှင့် မထပ်စေရန် */
+    }
+
+    /* ပုံဒီဇိုင်း */
     .center-image {
-      width: 280px; 
+      width: 160px; /* ဖုန်းတွင် ဘေးတိုက်ပေါ်နိုင်ရန် အရွယ်အစား အနည်းငယ်လျှော့ထားသည် */
       height: auto;
       border-radius: 20px; 
       box-shadow: 0 10px 30px rgba(0, 150, 255, 0.3); 
@@ -60,6 +69,16 @@
 
     .center-image:hover {
       transform: scale(1.05); 
+    }
+
+    /* ကွန်ပျူတာ/Tablet များအတွက် ပုံအရွယ်အစား ပိုကြီးရန် */
+    @media (min-width: 600px) {
+      .center-image {
+        width: 220px;
+      }
+      .image-container {
+        gap: 40px;
+      }
     }
   </style>
 </head>
@@ -70,10 +89,20 @@
     <div class="sub-title">ဖုန်းနံပါတ်အလှရောင်းဝယ်ရေး</div>
   </div>
 
-  <!-- အလယ်က ပုံနှင့် MPT လင့်ခ် (အသစ်ထပ်တိုးထားသည် ) -->
-  <a href="https://mmbsim.com/mpt/">
-    <img src="MPT.png" alt="MPT Simcard" class="center-image">
-  </a>
+  <!-- ပုံများစုထားသည့် နေရာ -->
+  <div class="image-container">
+    
+    <!-- MPT ပုံနှင့် လင့်ခ် -->
+    <a href="https://mmbsim.com/mpt/">
+      <img src="mpt.jpg" alt="MPT Simcard" class="center-image">
+    </a>
+
+    <!-- ATOM ပုံနှင့် လင့်ခ် (အသစ် ) -->
+    <a href="https://mmbsim.com/atom-2/">
+      <img src="ATOM.png" alt="ATOM Simcard" class="center-image">
+    </a>
+
+  </div>
 
 </body>
 </html>
