@@ -49,19 +49,17 @@
       line-height: 1.5;
     }
 
-    /* ပုံ ၄ ပုံကို အပေါ် ၂ ပုံ၊ အောက် ၂ ပုံ (2x2) ပေါ်စေရန် ပြင်ဆင်ထားသည် */
     .image-container {
       display: grid;
-      grid-template-columns: auto auto; /* ၂ ကော်လံခွဲမည် */
-      gap: 20px; /* ပုံများကြား အကွာအဝေး */
+      grid-template-columns: auto auto; 
+      gap: 20px; 
       justify-content: center;
       align-items: center;
       margin-top: 80px; 
     }
 
-    /* ပုံဒီဇိုင်း */
     .center-image {
-      width: 150px; /* ဖုန်းတွင် ၄ ပုံစလုံး အချိုးကျပေါ်ရန် အရွယ်အစား အနည်းငယ် ချိန်ထားသည် */
+      width: 150px; 
       height: auto;
       border-radius: 20px; 
       box-shadow: 0 10px 30px rgba(0, 150, 255, 0.3); 
@@ -72,7 +70,6 @@
       transform: scale(1.05); 
     }
 
-    /* ကွန်ပျူတာ/Tablet များအတွက် ပုံအရွယ်အစား ပိုကြီးရန် */
     @media (min-width: 600px) {
       .center-image {
         width: 220px;
@@ -80,6 +77,63 @@
       .image-container {
         gap: 40px;
       }
+    }
+
+    /* =========================================
+       အသစ်ထပ်တိုးထားသော Delivery Animation Code 
+       ========================================= */
+    .delivery-track {
+      position: absolute;
+      bottom: 30px; /* အောက်ခြေမှ အကွာအဝေး */
+      width: 90%;
+      max-width: 400px;
+      height: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 2px dashed rgba(255, 255, 255, 0.2); /* ကားလမ်းကြောင်း မျဉ်းပြတ် */
+      padding-bottom: 5px;
+    }
+
+    .track-icon {
+      text-align: center;
+      font-size: 24px;
+      z-index: 2;
+    }
+
+    .track-icon span {
+      display: block;
+      font-size: 12px;
+      color: #aaa;
+      margin-top: 5px;
+    }
+
+    .car-container {
+      position: absolute;
+      bottom: 5px;
+      left: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: drive 5s linear infinite; /* ၅ စက္ကန့်ကြာ တရွေ့ရွေ့သွားမည့် Animation */
+      z-index: 1;
+    }
+
+    .car-text {
+      font-size: 11px;
+      color: #0096ff;
+      font-weight: bold;
+      white-space: nowrap;
+      margin-bottom: 2px;
+      text-shadow: 0 0 5px rgba(0, 150, 255, 0.5);
+    }
+
+    /* ကားသွားမည့် လမ်းကြောင်းကို တွက်ချက်ခြင်း */
+    @keyframes drive {
+      0% { left: 30px; opacity: 0; }
+      10% { opacity: 1; }
+      85% { opacity: 1; }
+      100% { left: calc(100% - 70px); opacity: 0; }
     }
   </style>
 </head>
@@ -90,29 +144,43 @@
     <div class="sub-title">ဖုန်းနံပါတ်အလှရောင်းဝယ်ရေး</div>
   </div>
 
-  <!-- ပုံ ၄ ပုံ စုထားသည့် နေရာ -->
   <div class="image-container">
-    
-    <!-- MPT ပုံနှင့် လင့်ခ် -->
     <a href="https://mmbsim.com/mpt/">
       <img src="MPT.png" alt="MPT Simcard" class="center-image">
     </a>
-
-    <!-- ATOM ပုံနှင့် လင့်ခ် -->
     <a href="https://mmbsim.com/atom-2/">
       <img src="ATOM.png" alt="ATOM Simcard" class="center-image">
     </a>
-
-    <!-- Ooredoo ပုံနှင့် လင့်ခ် (အသစ် ) -->
     <a href="https://mmbsim.com/ooredoo/">
       <img src="U9.png" alt="Ooredoo Simcard" class="center-image">
     </a>
-
-    <!-- Mytel ပုံနှင့် လင့်ခ် (အသစ် ) -->
     <a href="https://mmbsim.com/mytel/">
       <img src="MYTEL.png" alt="Mytel Simcard" class="center-image">
     </a>
+  </div>
 
+  <!-- =========================================
+       အသစ်ထပ်တိုးထားသော Delivery Animation HTML 
+       ========================================= -->
+  <div class="delivery-track">
+    <!-- ဘယ်ဘက် (ဆိုင် ) -->
+    <div class="track-icon">🏪<span>ဆိုင်</span></div>
+    
+    <!-- ရွေ့လျားနေမည့် ကားနှင့် စာသား -->
+    <div class="car-container">
+      <span class="car-text">Cash on Delivery</span>
+      <!-- Code ဖြင့်ဆွဲထားသော ကားပုံ (Website မလေးစေရန်) -->
+      <svg width="35" height="22" viewBox="0 0 40 25" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 7 C2 5 4 3 6 3 H25 C26 3 27 4 27 5 V18 H2 V7 Z" fill="#0096FF"/>
+        <path d="M27 8 H33 L38 12 V18 H27 V8 Z" fill="#0096FF"/>
+        <rect x="29" y="9" width="4" height="3" fill="#050505"/>
+        <circle cx="9" cy="19" r="4" fill="#ffffff"/>
+        <circle cx="31" cy="19" r="4" fill="#ffffff"/>
+      </svg>
+    </div>
+
+    <!-- ညာဘက် (အိမ် ) -->
+    <div class="track-icon">🏠<span>အိမ်</span></div>
   </div>
 
 </body>
