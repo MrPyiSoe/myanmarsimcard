@@ -15,7 +15,7 @@
       height: 100vh;
       background-color: #050505; 
       background-image: 
-        radial-gradient(circle at 50% 50%, rgba(0, 150, 255, 0.15 ) 0%, transparent 60%),
+        radial-gradient(circle at 50% 50%, rgba(0, 150, 255, 0.15  ) 0%, transparent 60%),
         linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
       background-size: 100% 100%, 35px 35px, 35px 35px;
@@ -48,6 +48,19 @@
       letter-spacing: 1px;
       line-height: 1.5;
     }
+
+    /* အလယ်က ပုံအတွက် ဒီဇိုင်း (အသစ်ထပ်တိုးထားသည်) */
+    .center-image {
+      width: 280px; 
+      height: auto;
+      border-radius: 20px; 
+      box-shadow: 0 10px 30px rgba(0, 150, 255, 0.3); 
+      transition: transform 0.3s ease; 
+    }
+
+    .center-image:hover {
+      transform: scale(1.05); 
+    }
   </style>
 </head>
 <body>
@@ -56,6 +69,11 @@
     <a href="https://mmbsim.com/" class="top-title">mmbsim.com</a>
     <div class="sub-title">ဖုန်းနံပါတ်အလှရောင်းဝယ်ရေး</div>
   </div>
+
+  <!-- အလယ်က ပုံနှင့် MPT လင့်ခ် (အသစ်ထပ်တိုးထားသည် ) -->
+  <a href="https://mmbsim.com/mpt/">
+    <img src="https://via.placeholder.com/300x300?text=MPT+Image" alt="MPT Simcard" class="center-image">
+  </a>
 
 </body>
 </html>
