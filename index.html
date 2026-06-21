@@ -15,7 +15,7 @@
       height: 100vh;
       background-color: #050505; 
       background-image: 
-        radial-gradient(circle at 50% 50%, rgba(0, 150, 255, 0.15  ) 0%, transparent 60%),
+        radial-gradient(circle at 50% 50%, rgba(0, 150, 255, 0.15 ) 0%, transparent 60%),
         linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
       background-size: 100% 100%, 35px 35px, 35px 35px;
@@ -49,18 +49,19 @@
       line-height: 1.5;
     }
 
-    /* ပုံများ ဘေးတိုက်ပေါ်စေရန် စုထားမည့် နေရာ (အသစ်) */
+    /* ပုံ ၄ ပုံကို အပေါ် ၂ ပုံ၊ အောက် ၂ ပုံ (2x2) ပေါ်စေရန် ပြင်ဆင်ထားသည် */
     .image-container {
-      display: flex;
-      gap: 20px; /* ပုံနှစ်ပုံကြား အကွာအဝေး */
+      display: grid;
+      grid-template-columns: auto auto; /* ၂ ကော်လံခွဲမည် */
+      gap: 20px; /* ပုံများကြား အကွာအဝေး */
       justify-content: center;
       align-items: center;
-      margin-top: 80px; /* အပေါ်စာသားများနှင့် မထပ်စေရန် */
+      margin-top: 80px; 
     }
 
     /* ပုံဒီဇိုင်း */
     .center-image {
-      width: 160px; /* ဖုန်းတွင် ဘေးတိုက်ပေါ်နိုင်ရန် အရွယ်အစား အနည်းငယ်လျှော့ထားသည် */
+      width: 150px; /* ဖုန်းတွင် ၄ ပုံစလုံး အချိုးကျပေါ်ရန် အရွယ်အစား အနည်းငယ် ချိန်ထားသည် */
       height: auto;
       border-radius: 20px; 
       box-shadow: 0 10px 30px rgba(0, 150, 255, 0.3); 
@@ -89,7 +90,7 @@
     <div class="sub-title">ဖုန်းနံပါတ်အလှရောင်းဝယ်ရေး</div>
   </div>
 
-  <!-- ပုံများစုထားသည့် နေရာ -->
+  <!-- ပုံ ၄ ပုံ စုထားသည့် နေရာ -->
   <div class="image-container">
     
     <!-- MPT ပုံနှင့် လင့်ခ် -->
@@ -97,9 +98,19 @@
       <img src="MPT.png" alt="MPT Simcard" class="center-image">
     </a>
 
-    <!-- ATOM ပုံနှင့် လင့်ခ် (အသစ် ) -->
+    <!-- ATOM ပုံနှင့် လင့်ခ် -->
     <a href="https://mmbsim.com/atom-2/">
       <img src="ATOM.png" alt="ATOM Simcard" class="center-image">
+    </a>
+
+    <!-- Ooredoo ပုံနှင့် လင့်ခ် (အသစ် ) -->
+    <a href="https://mmbsim.com/ooredoo/">
+      <img src="U9.png" alt="Ooredoo Simcard" class="center-image">
+    </a>
+
+    <!-- Mytel ပုံနှင့် လင့်ခ် (အသစ် ) -->
+    <a href="https://mmbsim.com/mytel/">
+      <img src="MYTEL.png" alt="Mytel Simcard" class="center-image">
     </a>
 
   </div>
