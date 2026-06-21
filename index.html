@@ -266,7 +266,6 @@
       box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
     }
 
-    /* Cart Total Section */
     .cart-total-section {
       margin-top: 20px;
       padding-top: 15px;
@@ -308,6 +307,42 @@
     .checkout-btn:hover {
       background: linear-gradient(45deg, #1e7e34, #145523);
       box-shadow: 0 0 15px rgba(40, 167, 69, 0.5);
+    }
+
+    /* =========================================
+       Customer Form (အချက်အလက်ဖြည့်ရန်) ဒီဇိုင်း
+       ========================================= */
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-label {
+      display: block;
+      color: #e0e0e0;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+
+    .form-input {
+      width: 100%;
+      box-sizing: border-box;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      color: white;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Noto Sans Myanmar', sans-serif;
+      outline: none;
+      transition: border 0.3s;
+    }
+
+    .form-input:focus {
+      border-color: #0096ff;
+    }
+
+    textarea.form-input {
+      resize: none;
     }
   </style>
 </head>
@@ -382,15 +417,39 @@
         <span class="total-price" id="cartTotal">0 Ks</span>
       </div>
       
-      <button class="checkout-btn" onclick="checkout()">ဝယ်ယူမည် (Checkout)</button>
+      <button class="checkout-btn" onclick="openCheckoutForm()">ဝယ်ယူမည် (Checkout)</button>
+    </div>
+  </div>
+
+  <!-- အချက်အလက်ဖြည့်ရန် Popup Box (အသစ်) -->
+  <div id="checkoutModal" class="modal-overlay">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('checkoutModal')">&times;</span>
+      <h2 class="modal-title">အချက်အလက်ဖြည့်ပါ</h2>
+      
+      <div class="form-group">
+        <label class="form-label">အမည်</label>
+        <input type="text" id="customerName" class="form-input" placeholder="လူကြီးမင်း၏ အမည်">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">ဆက်သွယ်ရန် ဖုန်းနံပါတ်</label>
+        <input type="tel" id="customerPhone" class="form-input" placeholder="09xxxxxxxxx">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">ပို့ဆောင်ပေးရမည့် လိပ်စာ</label>
+        <textarea id="customerAddress" class="form-input" rows="3" placeholder="မြို့၊ မြို့နယ်၊ လမ်း၊ အိမ်အမှတ်"></textarea>
+      </div>
+      
+      <button class="checkout-btn" onclick="confirmOrder()">အော်ဒါတင်မည်</button>
     </div>
   </div>
 
   <!-- JavaScript (စနစ်များ အလုပ်လုပ်ရန်) -->
   <script>
-    let cart = []; // ခြင်းတောင်းထဲမှ ပစ္စည်းများ သိမ်းရန်
+    let cart = []; 
 
-    // ဖုန်းနံပါတ်များပြသည့် စနစ်
     async function showNumbers(jsonFile, operatorName, event) {
       event.preventDefault(); 
       
@@ -431,16 +490,12 @@
       }
     }
 
-    // ခြင်းတောင်းထဲသို့ ထည့်သည့် စနစ်
     function addToCart(number, price) {
       cart.push({ number, price });
       document.getElementById('cartBadge').innerText = cart.length;
-      
-      // အသိပေးစာလေး ပြမည်
       alert(number + " ကို ခြင်းတောင်းထဲ ထည့်လိုက်ပါပြီ။");
     }
 
-    // ခြင်းတောင်းကို ဖွင့်ပြသည့် စနစ်
     function showCartModal() {
       const modal = document.getElementById('cartModal');
       const cartList = document.getElementById('cartList');
@@ -454,7 +509,6 @@
         cartTotal.innerText = '0 Ks';
       } else {
         cart.forEach((item, index) => {
-          // ဈေးနှုန်းကို ဂဏန်းအဖြစ်ပြောင်းပြီး ပေါင်းမည် (ဥပမာ "50,000 Ks" မှ 50000 သို့)
           let priceNum = parseInt(item.price.replace(/,/g, '').replace(' Ks', ''));
           if(!isNaN(priceNum)) totalAmount += priceNum;
 
@@ -469,25 +523,37 @@
           `;
           cartList.appendChild(row);
         });
-        
-        // စုစုပေါင်းငွေကို ကော်မာလေးတွေနဲ့ ပြန်ပြမည်
         cartTotal.innerText = totalAmount.toLocaleString() + ' Ks';
       }
       
       modal.style.display = 'flex';
     }
 
-    // ခြင်းတောင်းထဲမှ ပြန်ဖျက်သည့် စနစ်
     function removeFromCart(index) {
-      cart.splice(index, 1); // ရွေးထားသည့်အရာကို ဖျက်မည်
+      cart.splice(index, 1); 
       document.getElementById('cartBadge').innerText = cart.length;
-      showCartModal(); // ခြင်းတောင်းကို ပြန် Refresh လုပ်မည်
+      showCartModal(); 
     }
 
-    // ဝယ်ယူမည် (Checkout) နှိပ်လျှင် Messenger သို့ ပို့မည့် စနစ်
-    function checkout() {
+    // Checkout နှိပ်လျှင် Form Box ပေါ်လာစေရန်
+    function openCheckoutForm() {
       if (cart.length === 0) {
         alert("ခြင်းတောင်းထဲတွင် ပစ္စည်းမရှိသေးပါ။");
+        return;
+      }
+      closeModal('cartModal'); // ခြင်းတောင်းကို ပိတ်မည်
+      document.getElementById('checkoutModal').style.display = 'flex'; // Form ကို ဖွင့်မည်
+    }
+
+    // အော်ဒါတင်မည် နှိပ်လျှင် Messenger သို့ ပို့မည့် စနစ်
+    function confirmOrder() {
+      const name = document.getElementById('customerName').value.trim();
+      const phone = document.getElementById('customerPhone').value.trim();
+      const address = document.getElementById('customerAddress').value.trim();
+
+      // အချက်အလက် အကုန်မဖြည့်ထားလျှင် သတိပေးမည်
+      if (!name || !phone || !address) {
+        alert("ကျေးဇူးပြု၍ အမည်၊ ဖုန်းနံပါတ် နှင့် လိပ်စာကို ပြည့်စုံစွာ ဖြည့်ပေးပါ။");
         return;
       }
 
@@ -497,24 +563,35 @@
       });
       
       let total = document.getElementById('cartTotal').innerText;
-      message += `\n💰 စုစုပေါင်း - ${total}`;
+      message += `\n💰 စုစုပေါင်း - ${total}\n\n`;
+      message += `👤 အမည်: ${name}\n`;
+      message += `📞 ဖုန်း: ${phone}\n`;
+      message += `🏠 လိပ်စာ: ${address}`;
 
       // YOUR_PAGE_ID နေရာတွင် အစ်ကို့ Page ID သို့မဟုတ် Username ထည့်ပါ
       const buyLink = `https://m.me/YOUR_PAGE_ID?text=${encodeURIComponent(message )}`;
       window.open(buyLink, '_blank');
+
+      // အော်ဒါတင်ပြီးပါက Form ကိုပိတ်ပြီး ခြင်းတောင်းကို ရှင်းလင်းမည်
+      closeModal('checkoutModal');
+      cart = [];
+      document.getElementById('cartBadge').innerText = '0';
+      document.getElementById('customerName').value = '';
+      document.getElementById('customerPhone').value = '';
+      document.getElementById('customerAddress').value = '';
     }
 
-    // Popup များကို ပိတ်သည့် စနစ်
     function closeModal(modalId) {
       document.getElementById(modalId).style.display = 'none';
     }
 
-    // အပြင်ဘက်ကို နှိပ်လျှင် Popup များ ပိတ်သွားစေရန်
     window.onclick = function(event) {
       const numberModal = document.getElementById('numberModal');
       const cartModal = document.getElementById('cartModal');
+      const checkoutModal = document.getElementById('checkoutModal');
       if (event.target == numberModal) numberModal.style.display = "none";
       if (event.target == cartModal) cartModal.style.display = "none";
+      if (event.target == checkoutModal) checkoutModal.style.display = "none";
     }
   </script>
 
