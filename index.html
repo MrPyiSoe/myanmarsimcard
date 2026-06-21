@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="my">
 <head>
+  <meta charset="UTF-8"> <!-- မြန်မာစာ မှန်ကန်စေရန် -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ဖုန်းနှင့်ကြည့်လျှင် အချိုးအစားမှန်စေရန် -->
   <title>Myanmar Simcard</title>
   <style>
     body {
@@ -15,36 +17,34 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      font-family: 'Pyidaungsu', 'Myanmar Text', Arial, sans-serif; /* မြန်မာစာအတွက် ဖောင့် */
+      font-family: 'Pyidaungsu', 'Padauk', 'Myanmar Text', sans-serif; /* မြန်မာစာ ဖောင့်များ */
     }
 
-    /* အပေါ်ဆုံးက စာသားများစုထားမည့် နေရာ */
     .header-container {
       position: absolute;
-      top: 50px; /* အပေါ်ဘက်မှ အကွာအဝေး */
-      text-align: center; /* စာသားများကို အလယ်တည့်တည့်ထားရန် */
+      top: 50px; 
+      text-align: center; 
+      width: 100%; /* ဖုန်းတွင် အလယ်တည့်တည့်ဖြစ်စေရန် */
     }
 
-    /* mmbsim.com စာသား ဒီဇိုင်း */
     .top-title {
       color: white; 
-      font-size: 36px; 
+      font-size: 32px; /* ဖုန်းနှင့်အဆင်ပြေစေရန် အနည်းငယ် ပြင်ထားသည် */
       font-weight: bold; 
       letter-spacing: 2px; 
-      margin-bottom: 10px; /* အောက်က မြန်မာစာနှင့် အကွာအဝေး */
+      margin-bottom: 10px; 
     }
 
-    /* မြန်မာစာသား ဒီဇိုင်း */
     .sub-title {
-      color: #e0e0e0; /* ငွေမှင်ရောင် (အဖြူထက် အနည်းငယ်မှိန်သည်) */
-      font-size: 22px; /* စာလုံးအရွယ်အစား */
+      color: #e0e0e0; 
+      font-size: 20px; 
       letter-spacing: 1px;
+      line-height: 1.5;
     }
   </style>
 </head>
 <body>
 
-  <!-- အပေါ်ဆုံးက စာသားများ -->
   <div class="header-container">
     <div class="top-title">mmbsim.com</div>
     <div class="sub-title">ဖုန်းနံပါတ်အလှရောင်းဝယ်ရေး</div>
