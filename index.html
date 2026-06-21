@@ -79,19 +79,17 @@
       }
     }
 
-    /* =========================================
-       အသစ်ထပ်တိုးထားသော Delivery Animation Code 
-       ========================================= */
+    /* Delivery Animation Code */
     .delivery-track {
       position: absolute;
-      bottom: 30px; /* အောက်ခြေမှ အကွာအဝေး */
+      bottom: 30px; 
       width: 90%;
       max-width: 400px;
       height: 40px;
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
-      border-bottom: 2px dashed rgba(255, 255, 255, 0.2); /* ကားလမ်းကြောင်း မျဉ်းပြတ် */
+      border-bottom: 2px dashed rgba(255, 255, 255, 0.2); 
       padding-bottom: 5px;
     }
 
@@ -101,13 +99,6 @@
       z-index: 2;
     }
 
-    .track-icon span {
-      display: block;
-      font-size: 12px;
-      color: #aaa;
-      margin-top: 5px;
-    }
-
     .car-container {
       position: absolute;
       bottom: 5px;
@@ -115,7 +106,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      animation: drive 5s linear infinite; /* ၅ စက္ကန့်ကြာ တရွေ့ရွေ့သွားမည့် Animation */
+      animation: drive 5s linear infinite; 
       z-index: 1;
     }
 
@@ -128,7 +119,6 @@
       text-shadow: 0 0 5px rgba(0, 150, 255, 0.5);
     }
 
-    /* ကားသွားမည့် လမ်းကြောင်းကို တွက်ချက်ခြင်း */
     @keyframes drive {
       0% { left: 30px; opacity: 0; }
       10% { opacity: 1; }
@@ -159,17 +149,14 @@
     </a>
   </div>
 
-  <!-- =========================================
-       အသစ်ထပ်တိုးထားသော Delivery Animation HTML 
-       ========================================= -->
+  <!-- Delivery Animation HTML -->
   <div class="delivery-track">
-    <!-- ဘယ်ဘက် (ဆိုင် ) -->
-    <div class="track-icon">🏪<span>ဆိုင်</span></div>
+    <!-- ဘယ်ဘက် -->
+    <div class="track-icon">🏪</div>
     
     <!-- ရွေ့လျားနေမည့် ကားနှင့် စာသား -->
     <div class="car-container">
       <span class="car-text">Cash on Delivery</span>
-      <!-- Code ဖြင့်ဆွဲထားသော ကားပုံ (Website မလေးစေရန်) -->
       <svg width="35" height="22" viewBox="0 0 40 25" xmlns="http://www.w3.org/2000/svg">
         <path d="M2 7 C2 5 4 3 6 3 H25 C26 3 27 4 27 5 V18 H2 V7 Z" fill="#0096FF"/>
         <path d="M27 8 H33 L38 12 V18 H27 V8 Z" fill="#0096FF"/>
@@ -179,8 +166,8 @@
       </svg>
     </div>
 
-    <!-- ညာဘက် (အိမ် ) -->
-    <div class="track-icon">🏠<span>အိမ်</span></div>
+    <!-- ညာဘက် -->
+    <div class="track-icon">🏠</div>
   </div>
 
 </body>
