@@ -25,6 +25,45 @@
       font-family: 'Noto Sans Myanmar', sans-serif; 
     }
 
+    /* =========================================
+       Shopping Cart (ဈေးခြင်းတောင်း) ဒီဇိုင်း
+       ========================================= */
+    .cart-container {
+      position: absolute;
+      top: 20px;
+      right: 25px;
+      cursor: pointer;
+      z-index: 100;
+      transition: transform 0.3s ease;
+    }
+
+    .cart-container:hover {
+      transform: scale(1.1);
+    }
+
+    .cart-icon {
+      width: 28px;
+      height: 28px;
+      stroke: white;
+    }
+
+    .cart-badge {
+      position: absolute;
+      top: -6px;
+      right: -8px;
+      background-color: #ff4444;
+      color: white;
+      font-size: 11px;
+      font-weight: bold;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+
     .header-container {
       position: absolute;
       top: 50px; 
@@ -221,6 +260,18 @@
 </head>
 <body>
 
+  <!-- =========================================
+       Shopping Cart (ဈေးခြင်းတောင်း) HTML
+       ========================================= -->
+  <div class="cart-container" onclick="alert('ခြင်းတောင်းထဲတွင် ပစ္စည်းမရှိသေးပါ')">
+    <svg class="cart-icon" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+      <circle cx="9" cy="21" r="1"></circle>
+      <circle cx="20" cy="21" r="1"></circle>
+      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+    </svg>
+    <span class="cart-badge">0</span>
+  </div>
+
   <div class="header-container">
     <a href="https://mmbsim.com/" class="top-title">mmbsim.com</a>
     <div class="sub-title">ဖုန်းနံပါတ်အလှရောင်းဝယ်ရေး</div>
@@ -234,8 +285,7 @@
       <img src="ATOM.png" alt="ATOM Simcard" class="center-image">
     </a>
     
-    <!-- U9 ပုံကို နှိပ်လျှင် Popup ပေါ်စေရန် ပြင်ဆင်ထားသည် (Ooredoo အစား U9 ဟု ပြောင်းထားသည် ) -->
-    <a href="#" onclick="showNumbers('ooredoo.json', 'U9', event)">
+    <a href="#" onclick="showNumbers('ooredoo.json', 'U9', event )">
       <img src="U9.png" alt="U9 Simcard" class="center-image">
     </a>
 
