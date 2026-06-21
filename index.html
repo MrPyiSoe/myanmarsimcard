@@ -25,9 +25,7 @@
       font-family: 'Noto Sans Myanmar', sans-serif; 
     }
 
-    /* =========================================
-       Shopping Cart (ဈေးခြင်းတောင်း) ဒီဇိုင်း
-       ========================================= */
+    /* Shopping Cart (ဈေးခြင်းတောင်း) ဒီဇိုင်း */
     .cart-container {
       position: absolute;
       top: 20px;
@@ -244,32 +242,85 @@
     .buy-btn {
       background: linear-gradient(45deg, #0096ff, #005bb5);
       color: white;
-      text-decoration: none;
+      border: none;
       padding: 8px 16px;
       border-radius: 8px;
       font-size: 14px;
       font-weight: bold;
+      cursor: pointer;
       transition: 0.3s;
+      font-family: 'Noto Sans Myanmar', sans-serif;
     }
 
     .buy-btn:hover {
       background: linear-gradient(45deg, #005bb5, #003f80);
       box-shadow: 0 0 10px rgba(0, 150, 255, 0.5);
     }
+
+    .remove-btn {
+      background: #ff4444;
+    }
+
+    .remove-btn:hover {
+      background: #cc0000;
+      box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+    }
+
+    /* Cart Total Section */
+    .cart-total-section {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .total-text {
+      color: white;
+      font-size: 16px;
+    }
+
+    .total-price {
+      color: #0096ff;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .checkout-btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: linear-gradient(45deg, #28a745, #1e7e34);
+      color: white;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 15px;
+      text-decoration: none;
+      transition: 0.3s;
+      border: none;
+      cursor: pointer;
+      font-family: 'Noto Sans Myanmar', sans-serif;
+    }
+
+    .checkout-btn:hover {
+      background: linear-gradient(45deg, #1e7e34, #145523);
+      box-shadow: 0 0 15px rgba(40, 167, 69, 0.5);
+    }
   </style>
 </head>
 <body>
 
-  <!-- =========================================
-       Shopping Cart (ဈေးခြင်းတောင်း) HTML
-       ========================================= -->
-  <div class="cart-container" onclick="alert('ခြင်းတောင်းထဲတွင် ပစ္စည်းမရှိသေးပါ')">
+  <!-- Shopping Cart (ဈေးခြင်းတောင်း) Icon -->
+  <div class="cart-container" onclick="showCartModal()">
     <svg class="cart-icon" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
       <circle cx="9" cy="21" r="1"></circle>
       <circle cx="20" cy="21" r="1"></circle>
       <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
     </svg>
-    <span class="cart-badge">0</span>
+    <span class="cart-badge" id="cartBadge">0</span>
   </div>
 
   <div class="header-container">
@@ -310,19 +361,36 @@
     <div class="track-icon">🏠</div>
   </div>
 
-  <!-- Popup Box (Modal ) HTML -->
+  <!-- ဖုန်းနံပါတ်များပြမည့် Popup Box -->
   <div id="numberModal" class="modal-overlay">
     <div class="modal-content">
-      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <span class="close-btn" onclick="closeModal('numberModal' )">&times;</span>
       <h2 id="modalTitle" class="modal-title">ဖုန်းနံပါတ်များ</h2>
-      <div id="numberList">
-        <!-- JSON မှ ဒေတာများ ဤနေရာတွင် အလိုအလျောက် ဝင်လာမည် -->
-      </div>
+      <div id="numberList"></div>
     </div>
   </div>
 
-  <!-- JavaScript (JSON ကိုဖတ်ရန်နှင့် Popup ပြရန်) -->
+  <!-- ဈေးခြင်းတောင်းပြမည့် Popup Box -->
+  <div id="cartModal" class="modal-overlay">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('cartModal')">&times;</span>
+      <h2 class="modal-title">ဈေးခြင်းတောင်း</h2>
+      <div id="cartList"></div>
+      
+      <div class="cart-total-section">
+        <span class="total-text">စုစုပေါင်း:</span>
+        <span class="total-price" id="cartTotal">0 Ks</span>
+      </div>
+      
+      <button class="checkout-btn" onclick="checkout()">ဝယ်ယူမည် (Checkout)</button>
+    </div>
+  </div>
+
+  <!-- JavaScript (စနစ်များ အလုပ်လုပ်ရန်) -->
   <script>
+    let cart = []; // ခြင်းတောင်းထဲမှ ပစ္စည်းများ သိမ်းရန်
+
+    // ဖုန်းနံပါတ်များပြသည့် စနစ်
     async function showNumbers(jsonFile, operatorName, event) {
       event.preventDefault(); 
       
@@ -349,32 +417,104 @@
           const row = document.createElement('div');
           row.className = 'number-row';
           
-          const message = encodeURIComponent(`မင်္ဂလာပါ၊ ${item.number} (${item.price}) ကို ဝယ်ယူလိုပါတယ်။`);
-          const buyLink = `https://m.me/YOUR_PAGE_ID?text=${message}`;
-
           row.innerHTML = `
             <div class="num-info">
               <span class="num-text">${item.number}</span>
               <span class="price-text">${item.price}</span>
             </div>
-            <a href="${buyLink}" target="_blank" class="buy-btn">Buy</a>
+            <button onclick="addToCart('${item.number}', '${item.price}')" class="buy-btn">Buy</button>
           `;
-          numberList.appendChild(row );
+          numberList.appendChild(row);
         });
       } catch (error) {
         numberList.innerHTML = '<p style="color: #ff4444; text-align: center;">ဒေတာ ယူရာတွင် အမှားအယွင်းဖြစ်နေပါသည်</p>';
       }
     }
 
-    function closeModal() {
-      document.getElementById('numberModal').style.display = 'none';
+    // ခြင်းတောင်းထဲသို့ ထည့်သည့် စနစ်
+    function addToCart(number, price) {
+      cart.push({ number, price });
+      document.getElementById('cartBadge').innerText = cart.length;
+      
+      // အသိပေးစာလေး ပြမည်
+      alert(number + " ကို ခြင်းတောင်းထဲ ထည့်လိုက်ပါပြီ။");
     }
 
-    window.onclick = function(event) {
-      const modal = document.getElementById('numberModal');
-      if (event.target == modal) {
-        modal.style.display = "none";
+    // ခြင်းတောင်းကို ဖွင့်ပြသည့် စနစ်
+    function showCartModal() {
+      const modal = document.getElementById('cartModal');
+      const cartList = document.getElementById('cartList');
+      const cartTotal = document.getElementById('cartTotal');
+      
+      cartList.innerHTML = '';
+      let totalAmount = 0;
+
+      if (cart.length === 0) {
+        cartList.innerHTML = '<p style="color: #aaa; text-align: center;">ခြင်းတောင်းထဲတွင် ပစ္စည်းမရှိသေးပါ</p>';
+        cartTotal.innerText = '0 Ks';
+      } else {
+        cart.forEach((item, index) => {
+          // ဈေးနှုန်းကို ဂဏန်းအဖြစ်ပြောင်းပြီး ပေါင်းမည် (ဥပမာ "50,000 Ks" မှ 50000 သို့)
+          let priceNum = parseInt(item.price.replace(/,/g, '').replace(' Ks', ''));
+          if(!isNaN(priceNum)) totalAmount += priceNum;
+
+          const row = document.createElement('div');
+          row.className = 'number-row';
+          row.innerHTML = `
+            <div class="num-info">
+              <span class="num-text">${item.number}</span>
+              <span class="price-text">${item.price}</span>
+            </div>
+            <button onclick="removeFromCart(${index})" class="buy-btn remove-btn">ဖျက်မည်</button>
+          `;
+          cartList.appendChild(row);
+        });
+        
+        // စုစုပေါင်းငွေကို ကော်မာလေးတွေနဲ့ ပြန်ပြမည်
+        cartTotal.innerText = totalAmount.toLocaleString() + ' Ks';
       }
+      
+      modal.style.display = 'flex';
+    }
+
+    // ခြင်းတောင်းထဲမှ ပြန်ဖျက်သည့် စနစ်
+    function removeFromCart(index) {
+      cart.splice(index, 1); // ရွေးထားသည့်အရာကို ဖျက်မည်
+      document.getElementById('cartBadge').innerText = cart.length;
+      showCartModal(); // ခြင်းတောင်းကို ပြန် Refresh လုပ်မည်
+    }
+
+    // ဝယ်ယူမည် (Checkout) နှိပ်လျှင် Messenger သို့ ပို့မည့် စနစ်
+    function checkout() {
+      if (cart.length === 0) {
+        alert("ခြင်းတောင်းထဲတွင် ပစ္စည်းမရှိသေးပါ။");
+        return;
+      }
+
+      let message = "မင်္ဂလာပါ၊ အောက်ပါ ဖုန်းနံပါတ်များကို ဝယ်ယူလိုပါတယ်-\n\n";
+      cart.forEach(item => {
+        message += `✅ ${item.number} (${item.price})\n`;
+      });
+      
+      let total = document.getElementById('cartTotal').innerText;
+      message += `\n💰 စုစုပေါင်း - ${total}`;
+
+      // YOUR_PAGE_ID နေရာတွင် အစ်ကို့ Page ID သို့မဟုတ် Username ထည့်ပါ
+      const buyLink = `https://m.me/YOUR_PAGE_ID?text=${encodeURIComponent(message )}`;
+      window.open(buyLink, '_blank');
+    }
+
+    // Popup များကို ပိတ်သည့် စနစ်
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+
+    // အပြင်ဘက်ကို နှိပ်လျှင် Popup များ ပိတ်သွားစေရန်
+    window.onclick = function(event) {
+      const numberModal = document.getElementById('numberModal');
+      const cartModal = document.getElementById('cartModal');
+      if (event.target == numberModal) numberModal.style.display = "none";
+      if (event.target == cartModal) cartModal.style.display = "none";
     }
   </script>
 
