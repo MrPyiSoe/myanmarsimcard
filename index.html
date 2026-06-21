@@ -526,4 +526,82 @@
 
     function removeFromCart(index) {
       cart.splice(index, 1); 
-      document.getElementById('cartBadge').
+      document.getElementById('cartBadge').innerText = cart.length;
+      showCartModal(); 
+    }
+
+    function openCheckoutForm() {
+      if (cart.length === 0) {
+        alert("ခြင်းတောင်းထဲတွင် ပစ္စည်းမရှိသေးပါ။");
+        return;
+      }
+      closeModal('cartModal'); 
+      document.getElementById('checkoutModal').style.display = 'flex'; 
+    }
+
+    // ==========================================
+    // Vercel Backend သို့ လှမ်းချိတ်မည့် စနစ်
+    // ==========================================
+    async function confirmOrder() {
+      const name = document.getElementById('customerName').value.trim();
+      const phone = document.getElementById('customerPhone').value.trim();
+      const address = document.getElementById('customerAddress').value.trim();
+
+      if (!name || !phone || !address) {
+        alert("ကျေးဇူးပြု၍ အမည်၊ ဖုန်းနံပါတ် နှင့် လိပ်စာကို ပြည့်စုံစွာ ဖြည့်ပေးပါ။");
+        return;
+      }
+
+      const btn = document.getElementById('submitOrderBtn');
+      btn.innerText = 'ပို့ဆောင်နေပါသည်...';
+      btn.disabled = true;
+
+      const total = document.getElementById('cartTotal').innerText;
+
+      try {
+        // Vercel တွင် ဆောက်ထားသော api/order.js သို့ Data ပို့ခြင်း
+        const response = await fetch('/api/order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, phone, address, cart, total })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert("အော်ဒါတင်ခြင်း အောင်မြင်ပါသည်။ မကြာမီ ဆက်သွယ်ပေးပါမည်။");
+          closeModal('checkoutModal');
+          cart = [];
+          document.getElementById('cartBadge').innerText = '0';
+          document.getElementById('customerName').value = '';
+          document.getElementById('customerPhone').value = '';
+          document.getElementById('customerAddress').value = '';
+        } else {
+          alert("အော်ဒါတင်ရာတွင် အမှားအယွင်းဖြစ်နေပါသည်။");
+          console.error(data.error);
+        }
+      } catch (error) {
+        alert("အင်တာနက် ချိတ်ဆက်မှု စစ်ဆေးပေးပါ။");
+        console.error(error);
+      } finally {
+        btn.innerText = 'အော်ဒါတင်မည်';
+        btn.disabled = false;
+      }
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      const numberModal = document.getElementById('numberModal');
+      const cartModal = document.getElementById('cartModal');
+      const checkoutModal = document.getElementById('checkoutModal');
+      if (event.target == numberModal) numberModal.style.display = "none";
+      if (event.target == cartModal) cartModal.style.display = "none";
+      if (event.target == checkoutModal) checkoutModal.style.display = "none";
+    }
+  </script>
+
+</body>
+</html>
