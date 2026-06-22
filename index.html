@@ -467,10 +467,16 @@
   <!-- 🌟 ဖုန်းနံပါတ်ပြမည့် Box အသစ် 🌟 -->
   <div id="numberModal" class="modal-overlay">
     <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="modalTitle" class="modal-title">ဖုန်းနံပါတ်များ</h2>
-        <span class="close-btn" onclick="closeModal('numberModal' )">&times;</span>
-      </div>
+      <div class="modal-header" style="flex-direction: column; align-items: flex-start; gap: 8px; width: 100%; box-sizing: border-box;">
+  <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+    <h2 id="modalTitle" class="modal-title" style="font-size: 16px;">ဖုန်းနံပါတ်များ</h2>
+    <span class="close-btn" onclick="closeModal('numberModal')">&times;</span>
+  </div>
+  <div style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid #444; border-radius: 10px; padding: 6px 12px; width: 93%; margin-top: 5px;">
+    <span style="font-size: 14px;">🔍</span>
+    <input type="text" id="modalSearchInput" placeholder="ဤနေရာတွင်လည်း ထပ်မံရှာဖွေနိုင်ပါသည်..." style="background: transparent; border: none; color: #fff; outline: none; width: 100%; margin-left: 8px; font-size: 14px; font-family: 'Noto Sans Myanmar', sans-serif;">
+  </div>
+</div>
       <div class="modal-body">
         <div id="numberList"></div>
       </div>
@@ -498,7 +504,7 @@
   <!-- 🌟 အချက်အလက်ဖြည့်မည့် Box အသစ် 🌟 -->
   <div id="checkoutModal" class="modal-overlay">
     <div class="modal-content">
-      <div class="modal-header">
+      
         <h2 class="modal-title">အချက်အလက်ဖြည့်ပါ</h2>
         <span class="close-btn" onclick="closeModal('checkoutModal')">&times;</span>
       </div>
@@ -630,32 +636,33 @@
     }
 
 
-   // 🌟 ၄။ Search Box မှာ စာရိုက်တာနဲ့ အော်ပရေတာ အားလုံးထဲက ရှာပြီး Modal တန်းပွင့်လာမည့် စနစ်
-    let searchTimeout; // စာရိုက်တာကို ခေတ္တစောင့်ဆိုင်းရန် Variable
+  // 🌟 ၄။ Search Box စနစ် (အပြင်ကော အထဲကော ၂ ခုလုံး ချိတ်ဆက်ထားသည်)
+    let searchTimeout;
 
-    document.getElementById('searchInput').addEventListener('input', function(e) {
-        const searchText = e.target.value.replace(/[\s\-]/g, '').toLowerCase();
-        
-        // ဝယ်သူ စာရိုက်နေတုန်း ရှာဖွေမှုကို ခေတ္တဆိုင်းငံ့ထားရန်
-        clearTimeout(searchTimeout);
+    // ရှာဖွေမှု အဓိက Logic ကို လုပ်ဆောင်ပေးမည့် ဘုံ Function
+    function performSearch(targetValue) {
+        const searchText = targetValue.replace(/[\s\-]/g, '').toLowerCase();
 
         if(searchText === "") {
             closeModal('numberModal');
             return;
         }
 
-        // 💡 စာရိုက်နှုန်း မြန်ဆန်စေရန်အတွက် ဂဏန်း ၃ လုံးအထက်ရှိမှ ရှာဖွေမှု စတင်ပါမည်
         if (searchText.length < 3) {
             return; 
         }
 
-        // ဝယ်သူ လက်ကီးဘုတ်ရိုက်တာ ရပ်သွားပြီး (၃၀၀ မီလီစက္ကန့်) ကြာမှ ရှာဖွေမှုကို တစ်ခါတည်း လုပ်ပေးမည်
+        clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
             const modal = document.getElementById('numberModal');
             const modalTitle = document.getElementById('modalTitle');
             
             modalTitle.innerText = "ရှာဖွေတွေ့ရှိသော ဖုန်းနံပါတ်များ";
             modal.style.display = 'flex'; 
+
+            // အပြင် Search Box နဲ့ Modal ထဲက Search Box (၂) ခုလုံးမှာ စာသားတွေ တူညီနေအောင် ထိန်းညှိခြင်း
+            document.getElementById('searchInput').value = targetValue;
+            document.getElementById('modalSearchInput').value = targetValue;
 
             // ကြိုတင်ဆွဲထားတဲ့ ဒေတာထဲကနေ လိုက်ရှာခြင်း
             const filteredData = allNumbersData.filter(item => {
@@ -664,8 +671,27 @@
             });
             
             renderNumbers(filteredData);
-        }, 300); // ၃၀၀ မီလီစက္ကန့် (ဝယ်သူ စာရိုက်လို့ ဝမယ့်အချိန်ကို စောင့်ပေးခြင်း)
+        }, 300);
+    }
+
+    // ပင်မစာမျက်နှာက အပြင် Search Box အတွက် Event Listener
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        performSearch(e.target.value);
     });
+
+    // Modal ထဲက ခေါင်းစဉ်နားက Search Box အသစ်အတွက် Event Listener
+    document.getElementById('modalSearchInput').addEventListener('input', function(e) {
+        performSearch(e.target.value);
+    });
+
+    // 🌟 မူလ closeModal Function ထဲတွင် Modal ပိတ်လျှင် Box (၂) ခုလုံးကို ရှင်းပစ်ရန် ဖြည့်စွက်ခြင်း
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+        if(modalId === 'numberModal') {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('modalSearchInput').value = ''; // Modal ထဲက ကွက်လပ်ပါ ရှင်းပစ်ခြင်း
+        }
+    }
 
 
     // --- အောက်က Code များသည် အစ်ကို့ရဲ့ မူလ ခြင်းတောင်း Logic များအတိုင်း ဖြစ်ပါသည် ---
