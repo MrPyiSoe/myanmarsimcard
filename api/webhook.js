@@ -13,7 +13,7 @@ export default async function handler(req, res) {
       const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
       const GITHUB_REPO = process.env.GITHUB_REPO;
 
-      // ✅ Order Confirm ကို နှိပ်ခဲ့လျှင် (နံပါတ်များ ချက်ချင်းဖျက်ပြီးသားဖြစ်၍ စာသားသာ ပြောင်းပေးမည်)
+      // ✅ Order Confirm ကို နှိပ်ခဲ့လျှင်
       if (action === 'confirm') {
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/editMessageText`, {
           method: 'POST',
@@ -27,17 +27,18 @@ export default async function handler(req, res) {
         return res.status(200).send('OK');
       }
 
-      // ❌ Order Cancelled ကို နှိပ်ခဲ့လျှင် (ဖျက်ထားသော နံပါတ်များကို ဝဘ်ဆိုက်သို့ ပြန်ထည့်ပေးမည်)
+      // ❌ Order Cancelled ကို နှိပ်ခဲ့လျှင်
       if (action === 'cancel') {
         const lines = text.split('\n');
         const cancelledItems = [];
         
-        // Telegram စာသားထဲမှ ဖုန်းနံပါတ်နှင့် ဈေးနှုန်းကို ပြန်ရှာခြင်း
+        // 🌟 ပိုက်ဆံအိတ် (💰) သင်္ကေတဖြင့် နံပါတ်နှင့် ဈေးနှုန်းကို အတိအကျ ခွဲထုတ်ခြင်း 🌟
         for (const line of lines) {
-          if (line.startsWith('- 09')) {
-            const match = line.match(/- (09[\d\s]+) \((.*?)\)/);
-            if (match) {
-              cancelledItems.push({ number: match[1].trim(), price: match[2].trim() });
+          const cleanLine = line.trim();
+          if (cleanLine.startsWith('- 09')) {
+            const parts = cleanLine.substring(2).split(' 💰 ');
+            if (parts.length === 2) {
+              cancelledItems.push({ number: parts[0].trim(), price: parts[1].trim() });
             }
           }
         }
@@ -45,7 +46,6 @@ export default async function handler(req, res) {
         if (cancelledItems.length > 0) {
           const fileUpdates = { 'ooredoo.json': [], 'atom.json': [], 'mytel.json': [], 'mpt.json': [] };
 
-          // ရှေ့ဆုံးဂဏန်းများကို ကြည့်၍ သက်ဆိုင်ရာ Operator ဖိုင်ခွဲခြားခြင်း
           for (const item of cancelledItems) {
             const cleanNum = item.number.replace(/\s/g, '');
             if (cleanNum.startsWith('099')) fileUpdates['ooredoo.json'].push(item);
@@ -54,7 +54,6 @@ export default async function handler(req, res) {
             else fileUpdates['mpt.json'].push(item);
           }
 
-          // သက်ဆိုင်ရာ JSON ဖိုင်များထဲသို့ ပြန်လည်ပေါင်းထည့်ခြင်း
           await Promise.all(Object.entries(fileUpdates).map(async ([file, itemsToAdd]) => {
             if (itemsToAdd.length === 0) return;
             try {
@@ -70,7 +69,6 @@ export default async function handler(req, res) {
                 const content = Buffer.from(fileData.content, 'base64').toString('utf8');
                 let json = JSON.parse(content);
 
-                // ပယ်ဖျက်လိုက်သော နံပါတ်များကို JSON အဟောင်းထဲသို့ ပြန်ပေါင်းထည့်ခြင်း
                 json = [...json, ...itemsToAdd];
 
                 const newContent = Buffer.from(JSON.stringify(json, null, 2)).toString('base64');
@@ -82,10 +80,10 @@ export default async function handler(req, res) {
                     'Accept': 'application/vnd.github.v3+json'
                   },
                   body: JSON.stringify({
-                    message: `Restored cancelled numbers: ${itemsToAdd.map(i => i.number ).join(', ')}`,
+                    message: `Restored cancelled numbers`,
                     content: newContent,
                     sha: fileData.sha
-                  })
+                  } )
                 });
               }
             } catch (e) {
@@ -94,7 +92,6 @@ export default async function handler(req, res) {
           }));
         }
 
-        // Telegram မက်ဆေ့ချ်ကို ပယ်ဖျက်ကြောင်း ပြောင်းလဲခြင်း
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/editMessageText`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
