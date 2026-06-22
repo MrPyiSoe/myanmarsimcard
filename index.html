@@ -173,6 +173,7 @@
       align-items: center;
     }
 
+    /* 🌟 Modal ပုံစံအသစ် (ခေါင်းစဉ်အသေထားရန်) 🌟 */
     .modal-content {
       background: #111;
       border: 1px solid #333;
@@ -180,31 +181,46 @@
       width: 90%;
       max-width: 400px;
       max-height: 80vh;
-      overflow-y: auto;
-      padding: 20px;
+      display: flex;
+      flex-direction: column;
       box-shadow: 0 10px 40px rgba(0, 150, 255, 0.2);
       position: relative;
+      overflow: hidden; 
     }
 
-    .close-btn {
-      position: absolute;
-      top: 15px; right: 20px;
-      color: #aaa;
-      font-size: 24px;
-      cursor: pointer;
-      font-weight: bold;
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      background: #1a1a1a;
+      border-bottom: 1px solid #333;
+      z-index: 10;
     }
-
-    .close-btn:hover { color: white; }
 
     .modal-title {
       color: white;
-      text-align: center;
-      margin-top: 0;
-      margin-bottom: 20px;
-      font-size: 22px;
-      border-bottom: 1px solid #333;
-      padding-bottom: 10px;
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .close-btn {
+      color: #ff4444;
+      font-size: 32px;
+      cursor: pointer;
+      font-weight: bold;
+      line-height: 1;
+      transition: 0.3s;
+    }
+
+    .close-btn:hover { 
+      color: #cc0000; 
+      transform: scale(1.1); 
+    }
+
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto; /* စာရင်းများကိုသာ အောက်ဆွဲကြည့်ရန် */
     }
 
     .number-row {
@@ -392,50 +408,63 @@
     <div class="track-icon">🏠</div>
   </div>
 
+  <!-- 🌟 ဖုန်းနံပါတ်ပြမည့် Box အသစ် 🌟 -->
   <div id="numberModal" class="modal-overlay">
     <div class="modal-content">
-      <span class="close-btn" onclick="closeModal('numberModal' )">&times;</span>
-      <h2 id="modalTitle" class="modal-title">ဖုန်းနံပါတ်များ</h2>
-      <div id="numberList"></div>
+      <div class="modal-header">
+        <h2 id="modalTitle" class="modal-title">ဖုန်းနံပါတ်များ</h2>
+        <span class="close-btn" onclick="closeModal('numberModal' )">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div id="numberList"></div>
+      </div>
     </div>
   </div>
 
+  <!-- 🌟 ခြင်းတောင်း Box အသစ် 🌟 -->
   <div id="cartModal" class="modal-overlay">
     <div class="modal-content">
-      <span class="close-btn" onclick="closeModal('cartModal')">&times;</span>
-      <h2 class="modal-title">ဈေးခြင်းတောင်း</h2>
-      <div id="cartList"></div>
-      
-      <div class="cart-total-section">
-        <span class="total-text">စုစုပေါင်း:</span>
-        <span class="total-price" id="cartTotal">0 Ks</span>
+      <div class="modal-header">
+        <h2 class="modal-title">ဈေးခြင်းတောင်း</h2>
+        <span class="close-btn" onclick="closeModal('cartModal')">&times;</span>
       </div>
-      
-      <button class="checkout-btn" onclick="openCheckoutForm()">ဝယ်ယူမည် (Checkout)</button>
+      <div class="modal-body">
+        <div id="cartList"></div>
+        <div class="cart-total-section">
+          <span class="total-text">စုစုပေါင်း:</span>
+          <span class="total-price" id="cartTotal">0 Ks</span>
+        </div>
+        <button class="checkout-btn" onclick="open
+          CheckoutForm()">ဝယ်ယူမည် (Checkout)</button>
+      </div>
     </div>
   </div>
 
+  <!-- 🌟 အချက်အလက်ဖြည့်မည့် Box အသစ် 🌟 -->
   <div id="checkoutModal" class="modal-overlay">
     <div class="modal-content">
-      <span class="close-btn" onclick="closeModal('checkoutModal')">&times;</span>
-      <h2 class="modal-title">အချက်အလက်ဖြည့်ပါ</h2>
-      
-      <div class="form-group">
-        <label class="form-label">အမည်</label>
-        <input type="text" id="customerName" class="form-input" placeholder="လူကြီးမင်း၏ အမည်">
+      <div class="modal-header">
+        <h2 class="modal-title">အချက်အလက်ဖြည့်ပါ</h2>
+        <span class="close-btn" onclick="closeModal('checkoutModal')">&times;</span>
       </div>
-      
-      <div class="form-group">
-        <label class="form-label">ဆက်သွယ်ရန် ဖုန်းနံပါတ်</label>
-        <input type="tel" id="customerPhone" class="form-input" placeholder="09xxxxxxxxx">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">အမည်</label>
+          <input type="text" id="customerName" class="form-input" placeholder="လူကြီးမင်း၏ အမည်">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">ဆက်သွယ်ရန် ဖုန်းနံပါတ်</label>
+          <input type="tel" id="customerPhone" class="form-input" placeholder="09xxxxxxxxx">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">ပို့ဆောင်ပေးရမည့် လိပ်စာ</label>
+          <textarea id="customerAddress" class="form-input" rows="3" placeholder="မြို့၊ မြို့နယ်၊ လမ်း၊ အိမ်အမှတ်"></textarea>
+        </div>
+        
+        <button id="submitOrderBtn" class="checkout-btn" onclick="confirmOrder()">အော်ဒါတင်မည်</button>
       </div>
-      
-      <div class="form-group">
-        <label class="form-label">ပို့ဆောင်ပေးရမည့် လိပ်စာ</label>
-        <textarea id="customerAddress" class="form-input" rows="3" placeholder="မြို့၊ မြို့နယ်၊ လမ်း၊ အိမ်အမှတ်"></textarea>
-      </div>
-      
-      <button id="submitOrderBtn" class="checkout-btn" onclick="confirmOrder()">အော်ဒါတင်မည်</button>
     </div>
   </div>
 
@@ -630,3 +659,4 @@
 
 </body>
 </html>
+
