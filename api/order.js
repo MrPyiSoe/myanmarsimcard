@@ -26,7 +26,7 @@ export default async function handler(req, res) {
       const lines = text.split('\n');
       const cancelledItems = [];
 
-      // 🌟 အစ်ကို့ရဲ့ အကြံဉာဏ်အတိုင်း * * ကြားက ဈေးနှုန်းကို ယူမည့်နည်းလမ်း 🌟
+      // 🌟 အပေါ်ပိုင်း Cancel လုပ်တဲ့နေရာမှာပါ * * ကို ရှာမည့် Code အသစ် 🌟
       for (const line of lines) {
         const match = line.trim().match(/^- (.*?)\s*\*([^*]+)\*$/);
         if (match) {
@@ -81,7 +81,7 @@ export default async function handler(req, res) {
   if (name && cart) {
     let orderText = `🛒 <b>အော်ဒါအသစ် ရောက်ပါပြီ!</b>\n\n👤 အမည်: ${name}\n📞 ဖုန်း: ${phone}\n📍 လိပ်စာ: ${address}\n\n🛍️ <b>မှာယူသော နံပါတ်များ:</b>\n`;
     
-    // 🌟 အစ်ကို့ရဲ့ အကြံဉာဏ်အတိုင်း ဈေးနှုန်းကို * * ဖြင့် ပို့မည့်အပိုင်း 🌟
+    // 🌟 အောက်ပိုင်း စာပို့တဲ့နေရာမှာ * * ဖြင့် ပို့မည့် Code အသစ် 🌟
     cart.forEach(item => { orderText += `- ${item.number} *${item.price}*\n`; });
     
     orderText += `\n💰 <b>စုစုပေါင်း: ${total}</b>`;
