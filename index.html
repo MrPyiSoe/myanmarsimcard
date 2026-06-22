@@ -455,7 +455,7 @@
 
       try {
         const response = await fetch(jsonFile + '?t=' + new Date().getTime());
-        const data = await response.json();
+        let data = await response.json();
         
         numberList.innerHTML = ''; 
         
@@ -464,14 +464,19 @@
            return;
         }
 
+        // 🌟 ဖုန်းနံပါတ်များကို ငယ်ရာမှ ကြီးရာသို့ အလိုအလျောက် စီပေးမည့်အပိုင်း 🌟
+        data.sort((a, b) => {
+          let numA = a.number.replace(/\D/g, '');
+          let numB = b.number.replace(/\D/g, '');
+          return numA.localeCompare(numB);
+        });
+
         data.forEach(item => {
-          // ခြင်းတောင်းထဲမှာ ပါပြီးသားလား စစ်ဆေးရန်
           const isAlreadyInCart = cart.some(cartItem => cartItem.number === item.number);
 
           const row = document.createElement('div');
           row.className = 'number-row';
           
-          // ခြင်းတောင်းထဲ ရောက်ပြီးသားဆိုရင် 'ရွေးပြီး' လို့ပြပြီး ခလုတ်ပိတ်ထားမည်
           if (isAlreadyInCart) {
             row.innerHTML = `
               <div class="num-info">
@@ -481,7 +486,6 @@
               <button class="buy-btn" style="background: #555; cursor: not-allowed; box-shadow: none;" disabled>ရွေးပြီး</button>
             `;
           } else {
-            // မရွေးရသေးရင် 'Buy' ခလုတ် ပုံမှန်အတိုင်း ပြမည်
             row.innerHTML = `
               <div class="num-info">
                 <span class="num-text">${item.number}</span>
@@ -498,18 +502,15 @@
     }
 
     function addToCart(number, price, btnElement) {
-      // ခြင်းတောင်းထဲမှာ ပါပြီးသားလား ထပ်စစ်ရန်
       const isAlreadyInCart = cart.some(item => item.number === number);
       if (isAlreadyInCart) {
         alert("ဒီနံပါတ်ကို ခြင်းတောင်းထဲ ထည့်ပြီးသားပါ။");
         return;
       }
 
-      // ခြင်းတောင်းထဲသို့ ထည့်ခြင်း
       cart.push({ number, price });
       document.getElementById('cartBadge').innerText = cart.length;
       
-      // ခလုတ်ကို 'ရွေးပြီး' လို့ ချက်ချင်းပြောင်းပြီး ထပ်နှိပ်လို့မရအောင် ပိတ်လိုက်မည်
       if (btnElement) {
         btnElement.innerText = "ရွေးပြီး";
         btnElement.style.background = "#555";
