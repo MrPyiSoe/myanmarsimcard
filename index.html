@@ -503,12 +503,14 @@
 
   <!-- 🌟 အချက်အလက်ဖြည့်မည့် Box အသစ် 🌟 -->
   <div id="checkoutModal" class="modal-overlay">
-    <div class="modal-content">
+    <div class="modal-content" style="display: flex; flex-direction: column; max-height: 85vh;">
       
-        <h2 class="modal-title">အချက်အလက်ဖြည့်ပါ</h2>
+      <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; width: 100%; box-sizing: border-box;">
+        <h2 class="modal-title" style="font-size: 20px; margin: 0;">အချက်အလက်ဖြည့်ပါ</h2>
         <span class="close-btn" onclick="closeModal('checkoutModal')">&times;</span>
       </div>
-      <div class="modal-body">
+      
+      <div class="modal-body" style="padding: 20px; overflow-y: auto;">
         <div class="form-group">
           <label class="form-label">အမည်</label>
           <input type="text" id="customerName" class="form-input" placeholder="လူကြီးမင်း၏ အမည်">
@@ -526,6 +528,7 @@
         
         <button id="submitOrderBtn" class="checkout-btn" onclick="confirmOrder()">အော်ဒါတင်မည်</button>
       </div>
+
     </div>
   </div>
 
