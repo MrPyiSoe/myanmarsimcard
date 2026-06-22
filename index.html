@@ -113,12 +113,24 @@
 
     .top-title {
       color: white; 
-      font-size: 32px; 
+      font-size: 32px; /* PC ပေါ်တွင် မူလအတိုင်း 32px ပြသမည် */
       font-weight: bold; 
-      letter-spacing: 2px; 
+      letter-spacing: 1px; 
       margin-bottom: 10px; 
       text-decoration: none; 
       display: block; 
+      word-wrap: break-word;
+    }
+
+    /* 📱 ဖုန်းမျက်နှာပြင် (မျက်နှာပြင်အကျယ် 600px အောက်) အတွက် သီးသန့်စနစ် */
+    @media (max-width: 600px) {
+      .top-title {
+        font-size: 24px; /* ဖုန်းထဲတွင် စာလုံးကို ဘောင်မကျော်အောင် 24px သို့ လျှော့ချပေးမည် */
+        letter-spacing: 0.5px;
+      }
+      .sub-title {
+        font-size: 16px; /* အောက်က "ဖုန်းနံပါတ်အလှရောင်းဝယ်ရေး" စာသားကိုပါ ဖုန်းနဲ့အချိုးကျအောင် ညှိပေးခြင်း */
+      }
     }
 
     .sub-title {
