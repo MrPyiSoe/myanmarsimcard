@@ -710,12 +710,12 @@
       if (event.target == cartModal) cartModal.style.display = "none";
       if (event.target == checkoutModal) checkoutModal.style.display = "none";
     }
-    // 🌟 နံပါတ်ရှာသည့် စနစ် 🌟
+ // 🌟 နံပါတ်ရှာသည့် စနစ် 🌟
 document.getElementById('searchInput').addEventListener('input', function(e) {
   const text = e.target.value.replace(/\s/g, '');
   
-  // ဖုန်းနံပါတ်ကတ်များ၏ class နာမည်ကို '.card' ဟု ယူဆထားပါသည်
-  const cards = document.querySelectorAll('.card'); 
+  // .card အစား အစ်ကို့ရဲ့ အမှန်ဖြစ်သော .number-row ကို ပြောင်းထည့်ထားပါသည်
+  const cards = document.querySelectorAll('.number-row'); 
   
   cards.forEach(card => {
     if(card.innerText.replace(/\s/g, '').includes(text)) {
@@ -725,6 +725,7 @@ document.getElementById('searchInput').addEventListener('input', function(e) {
     }
   });
 });
+
 
   </script>
 
