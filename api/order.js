@@ -26,11 +26,15 @@ export default async function handler(req, res) {
       const lines = text.split('\n');
       const cancelledItems = [];
 
-      // 🌟 အပေါ်ပိုင်း Cancel လုပ်တဲ့နေရာမှာပါ * * ကို ရှာမည့် Code အသစ် 🌟
+      // 🌟 ပိုက်ဆံအိတ် (💰) သင်္ကေတဖြင့် နံပါတ်နှင့် ဈေးနှုန်းကို အတိအကျ ခွဲထုတ်ခြင်း 🌟
       for (const line of lines) {
-        const match = line.trim().match(/^- (.*?)\s*\*([^*]+)\*$/);
-        if (match) {
-          cancelledItems.push({ number: match[1].trim(), price: match[2].trim() });
+        const cleanLine = line.trim();
+        if (cleanLine.startsWith('- 09')) {
+          // "- 09 7500 414 89 (B2B) 💰 15,000 Ks" ကို ' 💰 ' ဖြင့် နှစ်ပိုင်းခွဲမည်
+          const parts = cleanLine.substring(2).split(' 💰 ');
+          if (parts.length === 2) {
+            cancelledItems.push({ number: parts[0].trim(), price: parts[1].trim() });
+          }
         }
       }
 
@@ -81,10 +85,10 @@ export default async function handler(req, res) {
   if (name && cart) {
     let orderText = `🛒 <b>အော်ဒါအသစ် ရောက်ပါပြီ!</b>\n\n👤 အမည်: ${name}\n📞 ဖုန်း: ${phone}\n📍 လိပ်စာ: ${address}\n\n🛍️ <b>မှာယူသော နံပါတ်များ:</b>\n`;
     
-    // 🌟 အောက်ပိုင်း စာပို့တဲ့နေရာမှာ * * ဖြင့် ပို့မည့် Code အသစ် 🌟
-    cart.forEach(item => { orderText += `- ${item.number} *${item.price}*\n`; });
+    // 🌟 Telegram သို့ ပို့ရာတွင် ပိုက်ဆံအိတ် (💰) သင်္ကေတ ခံ၍ ပို့မည် 🌟
+    cart.forEach(item => { orderText += `- ${item.number} 💰 ${item.price}\n`; });
     
-    orderText += `\n💰 <b>စုစုပေါင်း: ${total}</b>`;
+    orderText += `\n💵 <b>စုစုပေါင်း: ${total}</b>`;
 
     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       method: 'POST',
