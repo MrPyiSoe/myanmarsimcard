@@ -1,77 +1,208 @@
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { name, phone, address, cart, total } = req.body;
+    const body = req.body;
 
     const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
     const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
     const GITHUB_REPO = process.env.GITHUB_REPO;
 
-    // ၁။ Telegram သို့ အော်ဒါပို့ခြင်း
-    let cartText = cart.map(item => `- ${item.number} (${item.price})`).join('\n');
-    const text = `📦 အော်ဒါအသစ်ဝင်လာပါပြီ!\n\n👤 အမည်: ${name}\n📞 ဖုန်း: ${phone}\n📍 လိပ်စာ: ${address}\n\n🛒 ဝယ်ယူမည့် နံပါတ်များ:\n${cartText}\n\n💰 စုစုပေါင်း: ${total}`;
+    // ==========================================
+    // ၁။ Telegram မှ Confirm / Cancel နှိပ်ခြင်းကို လက်ခံမည့်အပိုင်း
+    // ==========================================
+    if (body.callback_query) {
+      const callbackQuery = body.callback_query;
+      const action = callbackQuery.data;
+      const chatId = callbackQuery.message.chat.id;
+      const messageId = callbackQuery.message.message_id;
+      const text = callbackQuery.message.text;
 
-    const replyMarkup = {
-      inline_keyboard: [
-        [
-          { text: "✅ Order Confirm", callback_data: "confirm" },
-          { text: "❌ Order Cancelled", callback_data: "cancel" }
-        ]
-      ]
-    };
+      // ✅ Order Confirm ကို နှိပ်ခဲ့လျှင်
+      if (action === 'confirm') {
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/editMessageText`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            message_id: messageId,
+            text: text + "\n\n✅ အော်ဒါအတည်ပြုပြီးပါပြီ။ (နံပါတ်များကို ဝဘ်ဆိုက်မှ အပြီးတိုင် ဖျက်လိုက်ပါပြီ )"
+          })
+        });
+        return res.status(200).send('OK');
+      }
 
-    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: CHAT_ID,
-        text: text,
-        reply_markup: replyMarkup
-      } )
-    });
+      // ❌ Order Cancelled ကို နှိပ်ခဲ့လျှင်
+      if (action === 'cancel') {
+        const lines = text.split('\n');
+        const cancelledItems = [];
 
-    // ၂။ အော်ဒါတင်လိုက်သည်နှင့် JSON ဖိုင်များမှ ချက်ချင်း ဖျက်ပစ်ခြင်း (ယာယီဖျောက်ထားခြင်း)
-    const orderedNumbers = cart.map(item => item.number);
-    const files = ['mpt.json', 'atom.json', 'ooredoo.json', 'mytel.json'];
-
-    await Promise.all(files.map(async (file) => {
-      try {
-        const getRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${file}`, {
-          headers: {
-            'Authorization': `token ${GITHUB_TOKEN}`,
-            'Accept': 'application/vnd.github.v3+json'
+        // Telegram စာသားထဲမှ ဖုန်းနံပါတ်နှင့် ဈေးနှုန်းကို ပြန်ရှာခြင်း (ပိုမိုတိကျသော နည်းလမ်း)
+        for (const line of lines) {
+          if (line.trim().startsWith('- 09')) {
+            // "- 09 799 4222 97 (55,000 Ks)" ကဲ့သို့သော စာသားမှ နံပါတ်နှင့် ဈေးနှုန်းကို ခွဲထုတ်ခြင်း
+            const match = line.match(/- (09[\d\s]+).*?([\d,]+\s*Ks)/);
+            if (match) {
+              cancelledItems.push({ number: match[1].trim(), price: match[2].trim() });
+            }
           }
-        } );
-        if (!getRes.ok) return;
-        
-        const fileData = await getRes.json();
-        const content = Buffer.from(fileData.content, 'base64').toString('utf8');
-        let json = JSON.parse(content);
+        }
 
-        const initialLength = json.length;
-        json = json.filter(item => !orderedNumbers.includes(item.number));
+        if (cancelledItems.length > 0) {
+          const fileUpdates = { 'ooredoo.json': [], 'atom.json': [], 'mytel.json': [], 'mpt.json': [] };
 
-        if (json.length < initialLength) {
-          const newContent = Buffer.from(JSON.stringify(json, null, 2)).toString('base64');
-          await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${file}`, {
-            method: 'PUT',
+          // ရှေ့ဆုံးဂဏန်းများကို ကြည့်၍ သက်ဆိုင်ရာ Operator ဖိုင်ခွဲခြားခြင်း
+          for (const item of cancelledItems) {
+            const cleanNum = item.number.replace(/\s/g, '');
+            if (cleanNum.startsWith('099')) fileUpdates['ooredoo.json'].push(item);
+            else if (cleanNum.startsWith('097')) fileUpdates['atom.json'].push(item);
+            else if (cleanNum.startsWith('096')) fileUpdates['mytel.json'].push(item);
+            else fileUpdates['mpt.json'].push(item);
+          }
+
+          // သက်ဆိုင်ရာ JSON ဖိုင်များထဲသို့ ပြန်လည်ပေါင်းထည့်ခြင်း
+          await Promise.all(Object.entries(fileUpdates).map(async ([file, itemsToAdd]) => {
+            if (itemsToAdd.length === 0) return;
+            try {
+              const getRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${file}`, {
+                headers: {
+                  'Authorization': `token ${GITHUB_TOKEN}`,
+                  'Accept': 'application/vnd.github.v3+json'
+                }
+              } );
+              if (getRes.ok) {
+                const fileData = await getRes.json();
+                const content = Buffer.from(fileData.content, 'base64').toString('utf-8');
+                let jsonContent = JSON.parse(content);
+                
+                // ဖျက်ထားသော နံပါတ်များကို ပြန်ထည့်ခြင်း
+                jsonContent = jsonContent.concat(itemsToAdd);
+
+                // GitHub သို့ ပြန်လည်သိမ်းဆည်းခြင်း
+                await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${file}`, {
+                  method: 'PUT',
+                  headers: {
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                  },
+                  body: JSON.stringify({
+                    message: `Restore cancelled items to ${file}`,
+                    content: Buffer.from(JSON.stringify(jsonContent, null, 2 )).toString('base64'),
+                    sha: fileData.sha
+                  })
+                });
+              }
+            } catch (e) {
+              console.error(e);
+            }
+          }));
+        }
+
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/editMessageText`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            message_id: messageId,
+            text: text + "\n\n❌ အော်ဒါပယ်ဖျက်လိုက်ပါပြီ။ (နံပါတ်များကို ဝဘ်ဆိုက်သို့ ပြန်ထည့်ပေးလိုက်ပါပြီ )"
+          })
+        });
+        return res.status(200).send('OK');
+      }
+    }
+
+    // ==========================================
+    // ၂။ ဝဘ်ဆိုက်မှ အော်ဒါအသစ် တင်ခြင်းကို လက်ခံမည့်အပိုင်း
+    // ==========================================
+    const { name, phone, address, cart, total } = body;
+    
+    if (name && cart) {
+      let orderText = `🛒 <b>အော်ဒါအသစ် ရောက်ပါပြီ!</b>\n\n`;
+      orderText += `👤 အမည်: ${name}\n`;
+      orderText += `📞 ဖုန်း: ${phone}\n`;
+      orderText += `📍 လိပ်စာ: ${address}\n\n`;
+      orderText += `🛍️ <b>မှာယူသော နံပါတ်များ:</b>\n`;
+      
+      cart.forEach(item => {
+        orderText += `- ${item.number} (${item.price})\n`;
+      });
+      
+      orderText += `\n💰 <b>စုစုပေါင်း: ${total}</b>`;
+
+      const keyboard = {
+        inline_keyboard: [
+          [
+            { text: "✅ Order Confirm", callback_data: "confirm" },
+            { text: "❌ Order Cancelled", callback_data: "cancel" }
+          ]
+        ]
+      };
+
+      // Telegram သို့ ပို့ခြင်း
+      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: CHAT_ID,
+          text: orderText,
+          parse_mode: 'HTML',
+          reply_markup: keyboard
+        } )
+      });
+
+      // ==========================================
+      // ၃။ အော်ဒါတင်လိုက်သော နံပါတ်များကို JSON မှ ယာယီဖျက်ခြင်း
+      // ==========================================
+      const fileUpdates = { 'ooredoo.json': [], 'atom.json': [], 'mytel.json': [], 'mpt.json': [] };
+
+      for (const item of cart) {
+        const cleanNum = item.number.replace(/\s/g, '');
+        if (cleanNum.startsWith('099')) fileUpdates['ooredoo.json'].push(item.number);
+        else if (cleanNum.startsWith('097')) fileUpdates['atom.json'].push(item.number);
+        else if (cleanNum.startsWith('096')) fileUpdates['mytel.json'].push(item.number);
+        else fileUpdates['mpt.json'].push(item.number);
+      }
+
+      await Promise.all(Object.entries(fileUpdates).map(async ([file, numbersToRemove]) => {
+        if (numbersToRemove.length === 0) return;
+        try {
+          const getRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${file}`, {
             headers: {
               'Authorization': `token ${GITHUB_TOKEN}`,
               'Accept': 'application/vnd.github.v3+json'
-            },
-            body: JSON.stringify({
-              message: `Auto-removed pending numbers: ${orderedNumbers.join(', ' )}`,
-              content: newContent,
-              sha: fileData.sha
-            })
-          });
-        }
-      } catch (e) {
-        console.error("GitHub Update Error:", e);
-      }
-    }));
+            }
+          } );
+          if (getRes.ok) {
+            const fileData = await getRes.json();
+            const content = Buffer.from(fileData.content, 'base64').toString('utf-8');
+            let jsonContent = JSON.parse(content);
+            
+            // မှာယူသွားသော နံပါတ်များကို ဖယ်ထုတ်ခြင်း
+            jsonContent = jsonContent.filter(item => !numbersToRemove.includes(item.number));
 
-    return res.status(200).json({ success: true });
+            // GitHub သို့ ပြန်လည်သိမ်းဆည်းခြင်း
+            await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${file}`, {
+              method: 'PUT',
+              headers: {
+                'Authorization': `token ${GITHUB_TOKEN}`,
+                'Accept': 'application/vnd.github.v3+json'
+              },
+              body: JSON.stringify({
+                message: `Remove ordered items from ${file}`,
+                content: Buffer.from(JSON.stringify(jsonContent, null, 2 )).toString('base64'),
+                sha: fileData.sha
+              })
+            });
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }));
+
+      return res.status(200).json({ success: true });
+    }
+
+    return res.status(400).json({ error: 'Invalid request' });
+  } else {
+    res.status(405).json({ error: 'Method not allowed' });
   }
-  res.status(405).json({ error: 'Method Not Allowed' });
 }
