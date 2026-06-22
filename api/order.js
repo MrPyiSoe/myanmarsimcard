@@ -36,13 +36,18 @@ export default async function handler(req, res) {
         const lines = text.split('\n');
         const cancelledItems = [];
 
-        // Telegram စာသားထဲမှ ဖုန်းနံပါတ်နှင့် ဈေးနှုန်းကို ပြန်ရှာခြင်း (ပိုမိုတိကျသော နည်းလမ်း)
+        // Telegram စာသားထဲမှ ဖုန်းနံပါတ်နှင့် ဈေးနှုန်းကို ပြန်ရှာခြင်း (B2B ပါလည်း မမှားတော့မည့် နည်းလမ်းအသစ်)
         for (const line of lines) {
-          if (line.trim().startsWith('- 09')) {
-            // "- 09 799 4222 97 (55,000 Ks)" ကဲ့သို့သော စာသားမှ နံပါတ်နှင့် ဈေးနှုန်းကို ခွဲထုတ်ခြင်း
-            const match = line.match(/- (09[\d\s]+).*?([\d,]+\s*Ks)/);
-            if (match) {
-              cancelledItems.push({ number: match[1].trim(), price: match[2].trim() });
+          const lineStr = line.trim();
+          if (lineStr.startsWith('- 09')) {
+            // နောက်ဆုံးပိတ်ထားသော ( ) ကိုသာ ဈေးနှုန်းအဖြစ် ယူမည်
+            const lastParenOpen = lineStr.lastIndexOf(' (');
+            const lastParenClose = lineStr.lastIndexOf(')');
+            
+            if (lastParenOpen !== -1 && lastParenClose > lastParenOpen) {
+              const numberPart = lineStr.substring(2, lastParenOpen).trim();
+              const pricePart = lineStr.substring(lastParenOpen + 2, lastParenClose).trim();
+              cancelledItems.push({ number: numberPart, price: pricePart });
             }
           }
         }
@@ -149,7 +154,7 @@ export default async function handler(req, res) {
         } )
       });
 
-      // ==========================================
+           // ==========================================
       // ၃။ အော်ဒါတင်လိုက်သော နံပါတ်များကို JSON မှ ယာယီဖျက်ခြင်း
       // ==========================================
       const fileUpdates = { 'ooredoo.json': [], 'atom.json': [], 'mytel.json': [], 'mpt.json': [] };
