@@ -583,6 +583,9 @@
     window.addEventListener('DOMContentLoaded', preloadAllNumbers);
 
 
+    // 🌟 လက်ရှိဖွင့်ထားသော Operator အမျိုးအစားကို မှတ်ထားရန် Variable အသစ်
+    let currentActiveOperator = "ALL"; 
+
     // 🌟 ၂။ Operator လိုဂိုတစ်ခုချင်းစီကို နှိပ်တဲ့အခါ ပြသပေးမည့် လုပ်ဆောင်ချက်
     function showNumbers(jsonFile, operatorName, event) {
         if(event) event.preventDefault(); 
@@ -590,16 +593,19 @@
         const modal = document.getElementById('numberModal');
         const modalTitle = document.getElementById('modalTitle');
         
+        // လက်ရှိနှိပ်လိုက်တဲ့ Operator နာမည်ကို မှတ်သားထားခြင်း
+        currentActiveOperator = operatorName; 
+        
         modalTitle.innerText = operatorName + " ဖုန်းနံပါတ်များ";
         modal.style.display = 'flex'; 
 
-        // စုစုပေါင်းဒေတာထဲကမှ မိမိနှိပ်လိုက်တဲ့ Operator ဒေတာတစ်ခုတည်းကိုပဲ Filter လုပ်ပြီး UI မှာ ပြခြင်း
+        // မိမိနှိပ်လိုက်တဲ့ Operator ဒေတာတစ်ခုတည်းကိုပဲ စစ်ထုတ်ပြသခြင်း
         const operatorSpecificData = allNumbersData.filter(item => item.operator === operatorName);
         renderNumbers(operatorSpecificData);
     }
 
 
-    // 🌟 ၃။ နံပါတ်တွေကို HTML Row အဖြစ် Modal ထဲမှာ လှမ်းဆွဲပေးမည့် Function
+    // 🌟 ၃။ နံပါတ်များကို UI တွင် HTML Row အဖြစ် ပြသပေးမည့် Function
     function renderNumbers(dataList) {
         const numberList = document.getElementById('numberList');
         numberList.innerHTML = ''; 
@@ -614,8 +620,10 @@
             const row = document.createElement('div');
             row.className = 'number-row';
             
-            // ကမ္ဘာလုံးဆိုင်ရာ ရှာဖွေမှုဖြစ်တဲ့အတွက် ဘယ်အော်ပရေတာလဲဆိုတာ သိသာအောင် တံဆိပ်လေး (Badge) ထည့်ပေးထားသည်
-            const opBadge = `<span style="font-size: 11px; background: #222; color: #aaa; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">${item.operator}</span>`;
+            // အပြင်ကနေ ရှာဖွေတာ (ALL) ဆိုလျှင်သာ Operator Badge လေးကို ပြသမည်
+            const opBadge = currentActiveOperator === "ALL" 
+                ? `<span style="font-size: 11px; background: #222; color: #aaa; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">${item.operator}</span>` 
+                : "";
 
             if (isAlreadyInCart) {
                 row.innerHTML = `
@@ -639,56 +647,70 @@
     }
 
 
-  // 🌟 ၄။ Search Box စနစ် (စာသားဖျက်သော်လည်း Modal မပိတ်ဘဲ နံပါတ်အားလုံး ပြန်ပြမည့်စနစ်)
+    // 🌟 ၄။ Search Box စနစ် (အပြင်ကရှာလျှင် အားလုံးထဲကရှာပြီး၊ အထဲကရှာလျှင် သက်ဆိုင်ရာလိုင်းထဲကပဲ ရှာမည်)
     let searchTimeout;
 
-    function performSearch(targetValue) {
+    function performSearch(targetValue, isFromInsideModal = false) {
         const searchText = targetValue.replace(/[\s\-]/g, '').toLowerCase();
 
-        // 💡 အကယ်၍ စာသားတွေကို ပြန်ဖျက်လိုက်လို့ ကွက်လပ်ဖြစ်သွားရင်
+        // စာသားတွေ ပြန်ဖျက်လိုက်လို့ ကွက်လပ်ဖြစ်သွားလျှင်
         if(searchText === "") {
             clearTimeout(searchTimeout);
             const modalTitle = document.getElementById('modalTitle');
-            modalTitle.innerText = "ဖုန်းနံပါတ် အားလုံး";
             
-            // အပြင် Box နဲ့ အထဲ Box (၂) ခုလုံးကို ကွက်လပ်အဖြစ် တူညီအောင်လုပ်ပြီး နံပါတ်အားလုံးကို ပြန်ပြပေးမည်
-            document.getElementById('searchInput').value = "";
-            document.getElementById('modalSearchInput').value = "";
-            renderNumbers(allNumbersData); 
+            if (isFromInsideModal) {
+                // Modal ထဲကနေ ဖျက်တာဆိုရင် အဲဒီလိုင်းရဲ့ နံပါတ်အားလုံးကို ပြန်ပြမယ်
+                modalTitle.innerText = currentActiveOperator + " ဖုန်းနံပါတ်များ";
+                const originalOperatorData = allNumbersData.filter(item => item.operator === currentActiveOperator);
+                renderNumbers(originalOperatorData);
+            } else {
+                // အပြင်ကနေ ဖျက်တာဆိုရင် Modal ကိုပါ ပိတ်ပစ်မယ် (သို့မဟုတ် အားလုံးပြန်ပြမယ်)
+                closeModal('numberModal');
+            }
             return;
         }
 
-        // စာရိုက်နေစဉ် ခေတ္တဆိုင်းငံ့ရန်
         clearTimeout(searchTimeout);
         
         searchTimeout = setTimeout(() => {
             const modal = document.getElementById('numberModal');
             const modalTitle = document.getElementById('modalTitle');
             
-            modalTitle.innerText = "ရှာဖွေတွေ့ရှိသော ဖုန်းနံပါတ်များ";
             modal.style.display = 'flex'; 
 
+            // Input Box (၂) ခုလုံးမှာ စာသားတွေ တူညီနေအောင် ထိန်းညှိခြင်း
             document.getElementById('searchInput').value = targetValue;
             document.getElementById('modalSearchInput').value = targetValue;
 
-            // ဒေတာထဲကနေ လိုက်ရှာခြင်း
-            const filteredData = allNumbersData.filter(item => {
-                const cleanNumber = item.number.replace(/[\s\-]/g, '').toLowerCase();
-                return cleanNumber.includes(searchText);
-            });
-            
-            renderNumbers(filteredData);
+            if (isFromInsideModal) {
+                // 💡 ကွဲပြားသွားသည့်အချက်- Modal ထဲက ရှာဖွေမှုဆိုလျှင် လက်ရှိ Operator တစ်ခုတည်းထဲကပဲ ရှာမည်
+                modalTitle.innerText = `${currentActiveOperator} ထဲမှ ရှာဖွေတွေ့ရှိချက်`;
+                const filteredData = allNumbersData.filter(item => {
+                    const cleanNumber = item.number.replace(/[\s\-]/g, '').toLowerCase();
+                    return item.operator === currentActiveOperator && cleanNumber.includes(searchText);
+                });
+                renderNumbers(filteredData);
+            } else {
+                // 💡 အပြင်က ရှာဖွေမှုဆိုလျှင် Operator အားလုံး (ALL) ထဲကနေ လိုက်ရှာမည်
+                currentActiveOperator = "ALL"; 
+                modalTitle.innerText = "ရှာဖွေတွေ့ရှိသော ဖုန်းနံပါတ်များ";
+                const filteredData = allNumbersData.filter(item => {
+                    const cleanNumber = item.number.replace(/[\s\-]/g, '').toLowerCase();
+                    return cleanNumber.includes(searchText);
+                });
+                renderNumbers(filteredData);
+            }
         }, 300);
     }
 
-    // ပင်မစာမျက်နှာက အပြင် Search Box အတွက် Event Listener
+    // ပင်မစာမျက်နှာက အပြင် Search Box အတွက် (isFromInsideModal = false)
     document.getElementById('searchInput').addEventListener('input', function(e) {
-        performSearch(e.target.value);
+        performSearch(e.target.value, false);
     });
 
-    // Modal ထဲက ခေါင်းစဉ်နားက Search Box အသစ်အတွက် Event Listener
+    // Modal ထဲက ခေါင်းစဉ်နားက Search Box အသစ်အတွက် (isFromInsideModal = true)
     document.getElementById('modalSearchInput').addEventListener('input', function(e) {
-        performSearch(e.target.value);
+        performSearch(e.target.value, true);
     });
 
     // 🌟 မူလ closeModal Function ထဲတွင် Modal ပိတ်လျှင် Box (၂) ခုလုံးကို ရှင်းပစ်ရန် ဖြည့်စွက်ခြင်း
