@@ -525,209 +525,267 @@
 
   <script>
     let cart = []; 
+    
+    // 🌟 အော်ပရေတာ အားလုံးရဲ့ ဒေတာတွေကို စုသိမ်းထားမည့် Global Array
+    let allNumbersData = []; 
 
-    async function showNumbers(jsonFile, operatorName, event) {
-      event.preventDefault(); 
-      
-      const modal = document.getElementById('numberModal');
-      const modalTitle = document.getElementById('modalTitle');
-      const numberList = document.getElementById('numberList');
+    // 🌟 ၁။ ဝက်ဘ်ဆိုက် စပွင့်တာနဲ့ JSON ၄ ခုလုံးကို နောက်ကွယ်ကနေ ကြိုဆွဲထားမည့် Function
+    async function preloadAllNumbers() {
+        const operators = [
+            { file: 'mpt.json', name: 'MPT' },
+            { file: 'atom.json', name: 'ATOM' },
+            { file: 'ooredoo.json', name: 'U9' },
+            { file: 'mytel.json', name: 'MYTEL' }
+        ];
 
-      modalTitle.innerText = operatorName + " ဖုန်းနံပါတ်များ";
-      numberList.innerHTML = '<p style="color: #aaa; text-align: center;">ခဏစောင့်ပါ...</p>';
-      modal.style.display = 'flex'; 
+        try {
+            // JSON အားလုံးကို တစ်ပြိုင်နက်တည်း ဆွဲယူရန် Promise.all သုံးထားပါသည်
+            const fetchPromises = operators.map(async (op) => {
+                try {
+                    const response = await fetch(op.file + '?t=' + new Date().getTime());
+                    const data = await response.json();
+                    
+                    // ဒေတာတစ်ခုချင်းစီမှာ ဘယ် Operator လဲဆိုတာကို ခွဲခြားရလွယ်အောင် မှတ်ပေးထားသည်
+                    return data.map(item => ({ ...item, operator: op.name }));
+                } catch (e) {
+                    console.error(`${op.name} ဒေတာဆွဲရတာ အဆင်မပြေပါ - `, e);
+                    return [];
+                }
+            });
 
-      try {
-        const response = await fetch(jsonFile + '?t=' + new Date().getTime());
-        let data = await response.json();
+            const results = await Promise.all(fetchPromises);
+            // ရလာတဲ့ JSON ၄ ခုလုံးကို Array တစ်ခုတည်းဖြစ်အောင် ပေါင်းထည့်လိုက်ခြင်း
+            allNumbersData = results.flat();
+
+            // နံပါတ်များကို ငယ်ရာမှ ကြီးရာသို့ ကြိုတင် Sort လုပ်ထားခြင်း
+            allNumbersData.sort((a, b) => {
+                let numA = a.number.replace(/\D/g, '');
+                let numB = b.number.replace(/\D/g, '');
+                return numA.localeCompare(numB);
+            });
+
+            console.log("အော်ပရေတာ အားလုံးရဲ့ နံပါတ်ဒေတာများ ကြိုတင်ရယူပြီးပါပြီ။");
+        } catch (error) {
+            console.error("ဒေတာ ကြိုတင်ယူရာတွင် အမှားအယွင်းရှိပါသည် - ", error);
+        }
+    }
+
+    // ဝက်ဘ်ဆိုက် ပွင့်တာနဲ့ အထက်က ပေါင်းဆွဲတဲ့ Function ကို တန်းပတ်ပေးခြင်း
+    window.addEventListener('DOMContentLoaded', preloadAllNumbers);
+
+
+    // 🌟 ၂။ Operator လိုဂိုတစ်ခုချင်းစီကို နှိပ်တဲ့အခါ ပြသပေးမည့် လုပ်ဆောင်ချက်
+    function showNumbers(jsonFile, operatorName, event) {
+        if(event) event.preventDefault(); 
         
+        const modal = document.getElementById('numberModal');
+        const modalTitle = document.getElementById('modalTitle');
+        
+        modalTitle.innerText = operatorName + " ဖုန်းနံပါတ်များ";
+        modal.style.display = 'flex'; 
+
+        // စုစုပေါင်းဒေတာထဲကမှ မိမိနှိပ်လိုက်တဲ့ Operator ဒေတာတစ်ခုတည်းကိုပဲ Filter လုပ်ပြီး UI မှာ ပြခြင်း
+        const operatorSpecificData = allNumbersData.filter(item => item.operator === operatorName);
+        renderNumbers(operatorSpecificData);
+    }
+
+
+    // 🌟 ၃။ နံပါတ်တွေကို HTML Row အဖြစ် Modal ထဲမှာ လှမ်းဆွဲပေးမည့် Function
+    function renderNumbers(dataList) {
+        const numberList = document.getElementById('numberList');
         numberList.innerHTML = ''; 
         
-        if(data.length === 0) {
+        if(dataList.length === 0) {
            numberList.innerHTML = '<p style="color: #aaa; text-align: center;">နံပါတ်များ မရှိသေးပါ</p>';
            return;
         }
 
-        // 🌟 ဖုန်းနံပါတ်များကို ငယ်ရာမှ ကြီးရာသို့ အလိုအလျောက် စီပေးမည့်အပိုင်း 🌟
-        data.sort((a, b) => {
-          let numA = a.number.replace(/\D/g, '');
-          let numB = b.number.replace(/\D/g, '');
-          return numA.localeCompare(numB);
-        });
+        dataList.forEach(item => {
+            const isAlreadyInCart = cart.some(cartItem => cartItem.number === item.number);
+            const row = document.createElement('div');
+            row.className = 'number-row';
+            
+            // ကမ္ဘာလုံးဆိုင်ရာ ရှာဖွေမှုဖြစ်တဲ့အတွက် ဘယ်အော်ပရေတာလဲဆိုတာ သိသာအောင် တံဆိပ်လေး (Badge) ထည့်ပေးထားသည်
+            const opBadge = `<span style="font-size: 11px; background: #222; color: #aaa; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">${item.operator}</span>`;
 
-        data.forEach(item => {
-          const isAlreadyInCart = cart.some(cartItem => cartItem.number === item.number);
-
-          const row = document.createElement('div');
-          row.className = 'number-row';
-          
-          if (isAlreadyInCart) {
-            row.innerHTML = `
-              <div class="num-info">
-                <span class="num-text">${item.number}</span>
-                <span class="price-text">${item.price}</span>
-              </div>
-              <button class="buy-btn" style="background: #555; cursor: not-allowed; box-shadow: none;" disabled>ရွေးပြီး</button>
-            `;
-          } else {
-            row.innerHTML = `
-              <div class="num-info">
-                <span class="num-text">${item.number}</span>
-                <span class="price-text">${item.price}</span>
-              </div>
-              <button onclick="addToCart('${item.number}', '${item.price}', this)" class="buy-btn">Buy</button>
-            `;
-          }
-          numberList.appendChild(row);
+            if (isAlreadyInCart) {
+                row.innerHTML = `
+                    <div class="num-info">
+                        <span class="num-text">${item.number} ${opBadge}</span>
+                        <span class="price-text">${item.price}</span>
+                    </div>
+                    <button class="buy-btn" style="background: #555; cursor: not-allowed; box-shadow: none;" disabled>ရွေးပြီး</button>
+                `;
+            } else {
+                row.innerHTML = `
+                    <div class="num-info">
+                        <span class="num-text">${item.number} ${opBadge}</span>
+                        <span class="price-text">${item.price}</span>
+                    </div>
+                    <button onclick="addToCart('${item.number}', '${item.price}', this)" class="buy-btn">Buy</button>
+                `;
+            }
+            numberList.appendChild(row);
         });
-      } catch (error) {
-        numberList.innerHTML = '<p style="color: #ff4444; text-align: center;">ဒေတာ ယူရာတွင် အမှားအယွင်းဖြစ်နေပါသည်</p>';
-      }
     }
 
-    function addToCart(number, price, btnElement) {
-      const isAlreadyInCart = cart.some(item => item.number === number);
-      if (isAlreadyInCart) {
-        alert("ဒီနံပါတ်ကို ခြင်းတောင်းထဲ ထည့်ပြီးသားပါ။");
-        return;
-      }
 
-      cart.push({ number, price });
-      document.getElementById('cartBadge').innerText = cart.length;
-      
-      if (btnElement) {
-        btnElement.innerText = "ရွေးပြီး";
-        btnElement.style.background = "#555";
-        btnElement.style.cursor = "not-allowed";
-        btnElement.style.boxShadow = "none";
-        btnElement.disabled = true;
-      }
+    // 🌟 ၄။ Search Box မှာ စာရိုက်တာနဲ့ အော်ပရေတာ အားလုံးထဲက ရှာပြီး Modal တန်းပွင့်လာမည့် စနစ်
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        const searchText = e.target.value.replace(/[\s\-]/g, '').toLowerCase();
+        
+        if(searchText === "") {
+            // အကယ်၍ ရှာတဲ့စာသားကို ပြန်ဖျက်လိုက်ရင် Modal ကိုပါ ပိတ်ပေးလိုက်မည်
+            closeModal('numberModal');
+            return;
+        }
+
+        const modal = document.getElementById('numberModal');
+        const modalTitle = document.getElementById('modalTitle');
+        
+        modalTitle.innerText = "ရှာဖွေတွေ့ရှိသော ဖုန်းနံပါတ်များ";
+        modal.style.display = 'flex'; // စာရိုက်တာနဲ့ ဖုန်းနံပါတ်ပြမည့် Modal ကို တန်းဖွင့်ပေးခြင်း
+
+        // ကြိုတင်ဆွဲထားတဲ့ ၄ သာလုံးပေါင်း ဒေတာထဲကနေ လိုက်ရှာခြင်း
+        const filteredData = allNumbersData.filter(item => {
+            const cleanNumber = item.number.replace(/[\s\-]/g, '').toLowerCase();
+            return cleanNumber.includes(searchText);
+        });
+        
+        renderNumbers(filteredData);
+    });
+
+
+    // --- အောက်က Code များသည် အစ်ကို့ရဲ့ မူလ ခြင်းတောင်း Logic များအတိုင်း ဖြစ်ပါသည် ---
+    function addToCart(number, price, btnElement) {
+        const isAlreadyInCart = cart.some(item => item.number === number);
+        if (isAlreadyInCart) {
+            alert("ဒီနံပါတ်ကို ခြင်းတောင်းထဲ ထည့်ပြီးသားပါ။");
+            return;
+        }
+
+        cart.push({ number, price });
+        document.getElementById('cartBadge').innerText = cart.length;
+        
+        if (btnElement) {
+            btnElement.innerText = "ရွေးပြီး";
+            btnElement.style.background = "#555";
+            btnElement.style.cursor = "not-allowed";
+            btnElement.style.boxShadow = "none";
+            btnElement.disabled = true;
+        }
     }
 
     function showCartModal() {
-      const modal = document.getElementById('cartModal');
-      const cartList = document.getElementById('cartList');
-      const cartTotal = document.getElementById('cartTotal');
-      
-      cartList.innerHTML = '';
-      let totalAmount = 0;
+        const modal = document.getElementById('cartModal');
+        const cartList = document.getElementById('cartList');
+        const cartTotal = document.getElementById('cartTotal');
+        
+        cartList.innerHTML = '';
+        let totalAmount = 0;
 
-      if (cart.length === 0) {
-        cartList.innerHTML = '<p style="color: #aaa; text-align: center;">ခြင်းတောင်းထဲတွင် ပစ္စည်းမရှိသေးပါ</p>';
-        cartTotal.innerText = '0 Ks';
-      } else {
-        cart.forEach((item, index) => {
-          let priceNum = parseInt(item.price.replace(/,/g, '').replace(' Ks', ''));
-          if(!isNaN(priceNum)) totalAmount += priceNum;
+        if (cart.length === 0) {
+            cartList.innerHTML = '<p style="color: #aaa; text-align: center;">ခြင်းတောင်းထဲတွင် ပစ္စည်းမရှိသေးပါ</p>';
+            cartTotal.innerText = '0 Ks';
+        } else {
+            cart.forEach((item, index) => {
+                let priceNum = parseInt(item.price.replace(/,/g, '').replace(' Ks', ''));
+                if(!isNaN(priceNum)) totalAmount += priceNum;
 
-          const row = document.createElement('div');
-          row.className = 'number-row';
-          row.innerHTML = `
-            <div class="num-info">
-              <span class="num-text">${item.number}</span>
-              <span class="price-text">${item.price}</span>
-            </div>
-            <button onclick="removeFromCart(${index})" class="buy-btn remove-btn">ဖျက်မည်</button>
-          `;
-          cartList.appendChild(row);
-        });
-        cartTotal.innerText = totalAmount.toLocaleString() + ' Ks';
-      }
-      
-      modal.style.display = 'flex';
+                const row = document.createElement('div');
+                row.className = 'number-row';
+                row.innerHTML = `
+                    <div class="num-info">
+                        <span class="num-text">${item.number}</span>
+                        <span class="price-text">${item.price}</span>
+                    </div>
+                    <button onclick="removeFromCart(${index})" class="buy-btn remove-btn">ဖျက်မည်</button>
+                `;
+                cartList.appendChild(row);
+            });
+            cartTotal.innerText = totalAmount.toLocaleString() + ' Ks';
+        }
+        modal.style.display = 'flex';
     }
 
     function removeFromCart(index) {
-      cart.splice(index, 1); 
-      document.getElementById('cartBadge').innerText = cart.length;
-      showCartModal(); 
+        cart.splice(index, 1); 
+        document.getElementById('cartBadge').innerText = cart.length;
+        showCartModal(); 
     }
 
     function openCheckoutForm() {
-      if (cart.length === 0) {
-        alert("ခြင်းတောင်းထဲတွင် ပစ္စည်းမရှိသေးပါ။");
-        return;
-      }
-      closeModal('cartModal'); 
-      document.getElementById('checkoutModal').style.display = 'flex'; 
+        if (cart.length === 0) {
+            alert("ခြင်းတောင်းထဲတွင် ပစ္စည်းမရှိသေးပါ။");
+            return;
+        }
+        closeModal('cartModal'); 
+        document.getElementById('checkoutModal').style.display = 'flex'; 
     }
 
     async function confirmOrder() {
-      const name = document.getElementById('customerName').value.trim();
-      const phone = document.getElementById('customerPhone').value.trim();
-      const address = document.getElementById('customerAddress').value.trim();
+        const name = document.getElementById('customerName').value.trim();
+        const phone = document.getElementById('customerPhone').value.trim();
+        const address = document.getElementById('customerAddress').value.trim();
 
-      if (!name || !phone || !address) {
-        alert("ကျေးဇူးပြု၍ အမည်၊ ဖုန်းနံပါတ် နှင့် လိပ်စာကို ပြည့်စုံစွာ ဖြည့်ပေးပါ။");
-        return;
-      }
-
-      const btn = document.getElementById('submitOrderBtn');
-      btn.innerText = 'ပို့ဆောင်နေပါသည်...';
-      btn.disabled = true;
-
-      const total = document.getElementById('cartTotal').innerText;
-
-      try {
-        const response = await fetch('/api/order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, phone, address, cart, total })
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          alert("အော်ဒါတင်ခြင်း အောင်မြင်ပါသည်။ မကြာမီ ဆက်သွယ်ပေးပါမည်။");
-          closeModal('checkoutModal');
-          cart = [];
-          document.getElementById('cartBadge').innerText = '0';
-          document.getElementById('customerName').value = '';
-          document.getElementById('customerPhone').value = '';
-          document.getElementById('customerAddress').value = '';
-        } else {
-          alert("အော်ဒါတင်ရာတွင် အမှားအယွင်းဖြစ်နေပါသည်။");
-          console.error(data.error);
+        if (!name || !phone || !address) {
+            alert("ကျေးဇူးပြု၍ အမည်၊ ဖုန်းနံပါတ် နှင့် လိပ်စာကို ပြည့်စုံစွာ ဖြည့်ပေးပါ။");
+            return;
         }
-      } catch (error) {
-        alert("အင်တာနက် ချိတ်ဆက်မှု စစ်ဆေးပေးပါ။");
-        console.error(error);
-      } finally {
-        btn.innerText = 'အော်ဒါတင်မည်';
-        btn.disabled = false;
-      }
+
+        const btn = document.getElementById('submitOrderBtn');
+        btn.innerText = 'ပို့ဆောင်နေပါသည်...';
+        btn.disabled = true;
+
+        const total = document.getElementById('cartTotal').innerText;
+
+        try {
+            const response = await fetch('/api/order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, phone, address, cart, total })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert("အော်ဒါတင်ခြင်း အောင်မြင်ပါသည်။ မကြာမီ ဆက်သွယ်ပေးပါမည်။");
+                closeModal('checkoutModal');
+                cart = [];
+                document.getElementById('cartBadge').innerText = '0';
+                document.getElementById('customerName').value = '';
+                document.getElementById('customerPhone').value = '';
+                document.getElementById('customerAddress').value = '';
+            } else {
+                alert("အော်ဒါတင်ရာတွင် အမှားအယွင်းဖြစ်နေပါသည်။");
+                console.error(data.error);
+            }
+        } catch (error) {
+            alert("အင်တာနက် ချက်ဆက်မှု စစ်ဆေးပေးပါ။");
+            console.error(error);
+        } finally {
+            btn.innerText = 'အော်ဒါတင်မည်';
+            btn.disabled = false;
+        }
     }
 
     function closeModal(modalId) {
-      document.getElementById(modalId).style.display = 'none';
+        document.getElementById(modalId).style.display = 'none';
+        // Modal ပိတ်လိုက်ရင် Search Box ထဲက စာသားကိုပါ Clear လုပ်ပေးရန်
+        if(modalId === 'numberModal') {
+            document.getElementById('searchInput').value = '';
+        }
     }
 
     window.onclick = function(event) {
-      const numberModal = document.getElementById('numberModal');
-      const cartModal = document.getElementById('cartModal');
-      const checkoutModal = document.getElementById('checkoutModal');
-      if (event.target == numberModal) numberModal.style.display = "none";
-      if (event.target == cartModal) cartModal.style.display = "none";
-      if (event.target == checkoutModal) checkoutModal.style.display = "none";
+        const numberModal = document.getElementById('numberModal');
+        const cartModal = document.getElementById('cartModal');
+        const checkoutModal = document.getElementById('checkoutModal');
+        if (event.target == numberModal) closeModal('numberModal');
+        if (event.target == cartModal) cartModal.style.display = "none";
+        if (event.target == checkoutModal) checkoutModal.style.display = "none";
     }
- // 🌟 နံပါတ်ရှာသည့် စနစ် 🌟
-document.getElementById('searchInput').addEventListener('input', function(e) {
-  const text = e.target.value.replace(/\s/g, '');
-  
-  // .card အစား အစ်ကို့ရဲ့ အမှန်ဖြစ်သော .number-row ကို ပြောင်းထည့်ထားပါသည်
-  const cards = document.querySelectorAll('.number-row'); 
-  
-  cards.forEach(card => {
-    if(card.innerText.replace(/\s/g, '').includes(text)) {
-      card.style.display = '';
-    } else {
-      card.style.display = 'none';
-    }
-  });
-});
-
-
-  </script>
+</script>
 
 </body>
 </html>
