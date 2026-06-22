@@ -15,7 +15,7 @@
       height: 100vh;
       background-color: #050505; 
       background-image: 
-        radial-gradient(circle at 50% 50%, rgba(0, 150, 255, 0.15 ) 0%, transparent 60%),
+        radial-gradient(circle at 50% 50%, rgba(0, 150, 255, 0.15  ) 0%, transparent 60%),
         linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
       background-size: 100% 100%, 35px 35px, 35px 35px;
@@ -363,18 +363,16 @@
   </div>
 
   <div class="image-container">
-    <a href="https://mmbsim.com/mpt/">
+    <a href="#" onclick="showNumbers('mpt.json', 'MPT', event )">
       <img src="MPT.png" alt="MPT Simcard" class="center-image">
     </a>
-    <a href="https://mmbsim.com/atom-2/">
+    <a href="#" onclick="showNumbers('atom.json', 'ATOM', event)">
       <img src="ATOM.png" alt="ATOM Simcard" class="center-image">
     </a>
-    
-    <a href="#" onclick="showNumbers('ooredoo.json', 'U9', event )">
+    <a href="#" onclick="showNumbers('ooredoo.json', 'U9', event)">
       <img src="U9.png" alt="U9 Simcard" class="center-image">
     </a>
-
-    <a href="https://mmbsim.com/mytel/">
+    <a href="#" onclick="showNumbers('mytel.json', 'MYTEL', event)">
       <img src="MYTEL.png" alt="Mytel Simcard" class="center-image">
     </a>
   </div>
@@ -456,7 +454,6 @@
       modal.style.display = 'flex'; 
 
       try {
-        // cache မမိစေရန် timestamp ထည့်ထားသည်
         const response = await fetch(jsonFile + '?t=' + new Date().getTime());
         const data = await response.json();
         
@@ -468,16 +465,31 @@
         }
 
         data.forEach(item => {
+          // ခြင်းတောင်းထဲမှာ ပါပြီးသားလား စစ်ဆေးရန်
+          const isAlreadyInCart = cart.some(cartItem => cartItem.number === item.number);
+
           const row = document.createElement('div');
           row.className = 'number-row';
           
-          row.innerHTML = `
-            <div class="num-info">
-              <span class="num-text">${item.number}</span>
-              <span class="price-text">${item.price}</span>
-            </div>
-            <button onclick="addToCart('${item.number}', '${item.price}')" class="buy-btn">Buy</button>
-          `;
+          // ခြင်းတောင်းထဲ ရောက်ပြီးသားဆိုရင် 'ရွေးပြီး' လို့ပြပြီး ခလုတ်ပိတ်ထားမည်
+          if (isAlreadyInCart) {
+            row.innerHTML = `
+              <div class="num-info">
+                <span class="num-text">${item.number}</span>
+                <span class="price-text">${item.price}</span>
+              </div>
+              <button class="buy-btn" style="background: #555; cursor: not-allowed; box-shadow: none;" disabled>ရွေးပြီး</button>
+            `;
+          } else {
+            // မရွေးရသေးရင် 'Buy' ခလုတ် ပုံမှန်အတိုင်း ပြမည်
+            row.innerHTML = `
+              <div class="num-info">
+                <span class="num-text">${item.number}</span>
+                <span class="price-text">${item.price}</span>
+              </div>
+              <button onclick="addToCart('${item.number}', '${item.price}', this)" class="buy-btn">Buy</button>
+            `;
+          }
           numberList.appendChild(row);
         });
       } catch (error) {
@@ -485,10 +497,26 @@
       }
     }
 
-    function addToCart(number, price) {
+    function addToCart(number, price, btnElement) {
+      // ခြင်းတောင်းထဲမှာ ပါပြီးသားလား ထပ်စစ်ရန်
+      const isAlreadyInCart = cart.some(item => item.number === number);
+      if (isAlreadyInCart) {
+        alert("ဒီနံပါတ်ကို ခြင်းတောင်းထဲ ထည့်ပြီးသားပါ။");
+        return;
+      }
+
+      // ခြင်းတောင်းထဲသို့ ထည့်ခြင်း
       cart.push({ number, price });
       document.getElementById('cartBadge').innerText = cart.length;
-      alert(number + " ကို ခြင်းတောင်းထဲ ထည့်လိုက်ပါပြီ။");
+      
+      // ခလုတ်ကို 'ရွေးပြီး' လို့ ချက်ချင်းပြောင်းပြီး ထပ်နှိပ်လို့မရအောင် ပိတ်လိုက်မည်
+      if (btnElement) {
+        btnElement.innerText = "ရွေးပြီး";
+        btnElement.style.background = "#555";
+        btnElement.style.cursor = "not-allowed";
+        btnElement.style.boxShadow = "none";
+        btnElement.disabled = true;
+      }
     }
 
     function showCartModal() {
@@ -539,9 +567,6 @@
       document.getElementById('checkoutModal').style.display = 'flex'; 
     }
 
-    // ==========================================
-    // Vercel Backend သို့ လှမ်းချိတ်မည့် စနစ်
-    // ==========================================
     async function confirmOrder() {
       const name = document.getElementById('customerName').value.trim();
       const phone = document.getElementById('customerPhone').value.trim();
@@ -559,7 +584,6 @@
       const total = document.getElementById('cartTotal').innerText;
 
       try {
-        // Vercel တွင် ဆောက်ထားသော api/order.js သို့ Data ပို့ခြင်း
         const response = await fetch('/api/order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
