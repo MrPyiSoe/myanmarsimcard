@@ -408,22 +408,20 @@
 <body>
 
   <!-- 🌟 Search Box နှင့် ခြင်းတောင်း အုပ်စု 🌟 -->
-  <div style="position: fixed; top: 15px; right: 15px; display: flex; align-items: center; gap: 10px; z-index: 1000;">
+  <div style="position: fixed; top: 15px; right: 15px; left: 15px; display: flex; align-items: center; justify-content: flex-end; gap: 10px; z-index: 1000; pointer-events: none;">
     
-    <!-- Search Box အသစ် -->
-    <div style="display: flex; align-items: center; background: rgba(0, 0, 0, 0.7); border: 1px solid #555; border-radius: 20px; padding: 5px 10px; backdrop-filter: blur(5px);">
+    <div style="display: flex; align-items: center; background: rgba(0, 0, 0, 0.85); border: 1px solid #555; border-radius: 20px; padding: 6px 12px; backdrop-filter: blur(8px); max-width: 180px; flex-grow: 1; pointer-events: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
       <span style="font-size: 14px;">🔍</span>
-      <input type="text" id="searchInput" placeholder="ရှာရန်..." style="background: transparent; border: none; color: #fff; outline: none; width: 90px; margin-left: 5px; font-size: 14px;">
+      <input type="text" id="searchInput" placeholder="ရှာရန်..." style="background: transparent; border: none; color: #fff; outline: none; width: 100%; margin-left: 5px; font-size: 14px; font-family: 'Noto Sans Myanmar', sans-serif;">
     </div>
 
-    <!-- မူလ ခြင်းတောင်း Code -->
-    <div class="cart-container" onclick="showCartModal()" style="position: relative; top: 0; right: 0;">
-      <svg class="cart-icon" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+    <div class="cart-container" onclick="showCartModal()" style="position: relative; top: 0; right: 0; pointer-events: auto; flex-shrink: 0; background: rgba(0, 0, 0, 0.85); padding: 6px; border-radius: 50%; border: 1px solid #444; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+      <svg class="cart-icon" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="width: 22px; height: 22px;">
         <circle cx="9" cy="21" r="1"></circle>
         <circle cx="20" cy="21" r="1"></circle>
         <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
       </svg>
-      <span class="cart-badge" id="cartBadge">0</span>
+      <span class="cart-badge" id="cartBadge" style="top: -4px; right: -4px;">0</span>
     </div>
 
   </div>
