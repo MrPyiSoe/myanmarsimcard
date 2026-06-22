@@ -639,23 +639,28 @@
     }
 
 
-  // 🌟 ၄။ Search Box စနစ် (အပြင်ကော အထဲကော ၂ ခုလုံး ချိတ်ဆက်ထားသည်)
+  // 🌟 ၄။ Search Box စနစ် (စာသားဖျက်သော်လည်း Modal မပိတ်ဘဲ နံပါတ်အားလုံး ပြန်ပြမည့်စနစ်)
     let searchTimeout;
 
-    // ရှာဖွေမှု အဓိက Logic ကို လုပ်ဆောင်ပေးမည့် ဘုံ Function
     function performSearch(targetValue) {
         const searchText = targetValue.replace(/[\s\-]/g, '').toLowerCase();
 
+        // 💡 အကယ်၍ စာသားတွေကို ပြန်ဖျက်လိုက်လို့ ကွက်လပ်ဖြစ်သွားရင်
         if(searchText === "") {
-            closeModal('numberModal');
+            clearTimeout(searchTimeout);
+            const modalTitle = document.getElementById('modalTitle');
+            modalTitle.innerText = "ဖုန်းနံပါတ် အားလုံး";
+            
+            // အပြင် Box နဲ့ အထဲ Box (၂) ခုလုံးကို ကွက်လပ်အဖြစ် တူညီအောင်လုပ်ပြီး နံပါတ်အားလုံးကို ပြန်ပြပေးမည်
+            document.getElementById('searchInput').value = "";
+            document.getElementById('modalSearchInput').value = "";
+            renderNumbers(allNumbersData); 
             return;
         }
 
-        if (searchText.length < 3) {
-            return; 
-        }
-
+        // စာရိုက်နေစဉ် ခေတ္တဆိုင်းငံ့ရန်
         clearTimeout(searchTimeout);
+        
         searchTimeout = setTimeout(() => {
             const modal = document.getElementById('numberModal');
             const modalTitle = document.getElementById('modalTitle');
@@ -663,11 +668,10 @@
             modalTitle.innerText = "ရှာဖွေတွေ့ရှိသော ဖုန်းနံပါတ်များ";
             modal.style.display = 'flex'; 
 
-            // အပြင် Search Box နဲ့ Modal ထဲက Search Box (၂) ခုလုံးမှာ စာသားတွေ တူညီနေအောင် ထိန်းညှိခြင်း
             document.getElementById('searchInput').value = targetValue;
             document.getElementById('modalSearchInput').value = targetValue;
 
-            // ကြိုတင်ဆွဲထားတဲ့ ဒေတာထဲကနေ လိုက်ရှာခြင်း
+            // ဒေတာထဲကနေ လိုက်ရှာခြင်း
             const filteredData = allNumbersData.filter(item => {
                 const cleanNumber = item.number.replace(/[\s\-]/g, '').toLowerCase();
                 return cleanNumber.includes(searchText);
