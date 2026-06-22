@@ -630,29 +630,41 @@
     }
 
 
-    // 🌟 ၄။ Search Box မှာ စာရိုက်တာနဲ့ အော်ပရေတာ အားလုံးထဲက ရှာပြီး Modal တန်းပွင့်လာမည့် စနစ်
+   // 🌟 ၄။ Search Box မှာ စာရိုက်တာနဲ့ အော်ပရေတာ အားလုံးထဲက ရှာပြီး Modal တန်းပွင့်လာမည့် စနစ်
+    let searchTimeout; // စာရိုက်တာကို ခေတ္တစောင့်ဆိုင်းရန် Variable
+
     document.getElementById('searchInput').addEventListener('input', function(e) {
         const searchText = e.target.value.replace(/[\s\-]/g, '').toLowerCase();
         
+        // ဝယ်သူ စာရိုက်နေတုန်း ရှာဖွေမှုကို ခေတ္တဆိုင်းငံ့ထားရန်
+        clearTimeout(searchTimeout);
+
         if(searchText === "") {
-            // အကယ်၍ ရှာတဲ့စာသားကို ပြန်ဖျက်လိုက်ရင် Modal ကိုပါ ပိတ်ပေးလိုက်မည်
             closeModal('numberModal');
             return;
         }
 
-        const modal = document.getElementById('numberModal');
-        const modalTitle = document.getElementById('modalTitle');
-        
-        modalTitle.innerText = "ရှာဖွေတွေ့ရှိသော ဖုန်းနံပါတ်များ";
-        modal.style.display = 'flex'; // စာရိုက်တာနဲ့ ဖုန်းနံပါတ်ပြမည့် Modal ကို တန်းဖွင့်ပေးခြင်း
+        // 💡 စာရိုက်နှုန်း မြန်ဆန်စေရန်အတွက် ဂဏန်း ၃ လုံးအထက်ရှိမှ ရှာဖွေမှု စတင်ပါမည်
+        if (searchText.length < 3) {
+            return; 
+        }
 
-        // ကြိုတင်ဆွဲထားတဲ့ ၄ သာလုံးပေါင်း ဒေတာထဲကနေ လိုက်ရှာခြင်း
-        const filteredData = allNumbersData.filter(item => {
-            const cleanNumber = item.number.replace(/[\s\-]/g, '').toLowerCase();
-            return cleanNumber.includes(searchText);
-        });
-        
-        renderNumbers(filteredData);
+        // ဝယ်သူ လက်ကီးဘုတ်ရိုက်တာ ရပ်သွားပြီး (၃၀၀ မီလီစက္ကန့်) ကြာမှ ရှာဖွေမှုကို တစ်ခါတည်း လုပ်ပေးမည်
+        searchTimeout = setTimeout(() => {
+            const modal = document.getElementById('numberModal');
+            const modalTitle = document.getElementById('modalTitle');
+            
+            modalTitle.innerText = "ရှာဖွေတွေ့ရှိသော ဖုန်းနံပါတ်များ";
+            modal.style.display = 'flex'; 
+
+            // ကြိုတင်ဆွဲထားတဲ့ ဒေတာထဲကနေ လိုက်ရှာခြင်း
+            const filteredData = allNumbersData.filter(item => {
+                const cleanNumber = item.number.replace(/[\s\-]/g, '').toLowerCase();
+                return cleanNumber.includes(searchText);
+            });
+            
+            renderNumbers(filteredData);
+        }, 300); // ၃၀၀ မီလီစက္ကန့် (ဝယ်သူ စာရိုက်လို့ ဝမယ့်အချိန်ကို စောင့်ပေးခြင်း)
     });
 
 
