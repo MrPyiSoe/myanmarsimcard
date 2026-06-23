@@ -125,7 +125,6 @@
       line-height: 1.5;
     }
 
-    /* 🌟 Operator ၅ ခုကို PC တွင် ဘေးတိုက်၊ ဖုန်းတွင် အချိုးကျ သေးပေးမည့် Responsive စနစ် 🌟 */
     .operator-container {
       display: flex;
       justify-content: center;
@@ -151,27 +150,26 @@
     .operator-card:hover {
       transform: scale(1.05); 
     }
-/* 🌟 အောက်ဆုံးက မူပိုင်ခွင့်စာသား (Footer) အတွက် Style 🌟 */
+
     .site-footer {
       position: absolute;
-      bottom: 8px; /* အောက်ခြေကပ်နေစေရန် */
+      bottom: 8px; 
       width: 100%;
       text-align: center;
-      color: rgba(255, 255, 255, 0.4); /* စာသားကို ခပ်မှိန်မှိန်လေး ဖြစ်စေရန် */
-      font-size: 11px; /* စာသားအသေးလေး */
+      color: rgba(255, 255, 255, 0.4); 
+      font-size: 11px; 
       letter-spacing: 0.5px;
       z-index: 5;
-      pointer-events: none; /* တခြားအရာတွေကို နှိပ်ရတာ မပိတ်ဆို့စေရန် */
+      pointer-events: none; 
     }
 
-    /* ဖုန်းပေါ်တွင် စာသား ပိုအဆင်ပြေစေရန် */
     @media (max-width: 600px) {
       .site-footer {
         font-size: 10px;
         bottom: 5px;
       }
     }
-    /* 📱 ဖုန်းမျက်နှာပြင် (Mobile Screen 600px အောက်) အတွက် သီးသန့်စနစ်များ */
+
     @media (max-width: 600px) {
       .top-title {
         font-size: 24px; 
@@ -180,18 +178,17 @@
       .sub-title {
         font-size: 16px; 
       }
-      /* 🌟 ဖုန်းပေါ်တွင် အော်ပရေတာပုံများကို အပေါ် ၃ ခု၊ အောက် ၂ ခု ညီညာစွာ ခေါက်ချမည့်စနစ် 🌟 */
       .operator-container {
         display: flex;
-        flex-wrap: wrap; /* ပုံများဆံ့အောင် အောက်တန်းသို့ အလိုအလျောက် ဆင်းစေခြင်း */
-        justify-content: center; /* ပုံအားလုံးကို အလယ်တည့်တည့် ညှိခြင်း */
-        gap: 15px; /* ပုံတစ်ပုံချင်းစီရဲ့ ကြားအကွာအဝေး */
+        flex-wrap: wrap; 
+        justify-content: center; 
+        gap: 15px; 
         margin-top: 60px;
         padding: 0 15px;
-        max-width: 340px; /* အတန်းလိုက် ၃ ခုပဲ ဆံ့စေရန် အကျယ်ကို ထိန်းထားခြင်း */
+        max-width: 340px; 
       }
       .operator-card {
-        width: 28%; /* အပေါ်တန်းတွင် ၃ ခု ကွက်တိ ပေါ်စေရန် အချိုးချခြင်း */
+        width: 28%; 
         max-width: 85px; 
         height: auto;
       }
@@ -491,15 +488,16 @@
     </div>
     <div class="track-icon">🏠</div>
   </div>
-<!-- 🌟 အောက်ဆုံး မူပိုင်ခွင့်စာသား 🌟 -->
+
   <div class="site-footer">
     &copy; 2021 - 2026 Myanmar Beauty Sim Store. All Rights Reserved.
   </div>
+
   <div id="numberModal" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header" style="flex-direction: column; align-items: flex-start; gap: 8px; width: 100%; box-sizing: border-box;">
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <h2 id="modalTitle" class="modal-title" style="font-size: 16px;">ဖုန်းနံပါတ်များ</h2>
+          <h2 class="modal-title" style="font-size: 16px;"><span id="modalTitle">ဖုန်းနံပါတ်များ</span><span id="operatorCount" style="color: #0096ff; font-size: 14px; font-weight: normal; margin-left: 5px;"></span></h2>
           <span class="close-btn" onclick="closeModal('numberModal' )">&times;</span>
         </div>
         <div style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid #444; border-radius: 10px; padding: 6px 12px; width: 93%; margin-top: 5px;">
@@ -568,10 +566,8 @@
   <script>
     let cart = []; 
     
-    // 🌟 အော်ပရေတာ အားလုံးရဲ့ ဒေတာတွေကို စုသိမ်းထားမည့် Global Array
     let allNumbersData = []; 
 
-    // 🌟 ၁။ ဝက်ဘ်ဆိုက် စပွင့်တာနဲ့ JSON ၅ ခုလုံးကို နောက်ကွယ်ကနေ ကြိုဆွဲထားမည့် Function
     async function preloadAllNumbers() {
         const operators = [
             { file: 'mpt.json', name: 'MPT' },
@@ -587,7 +583,6 @@
                     const response = await fetch(op.file + '?t=' + new Date().getTime());
                     const data = await response.json();
                     return data.map(item => {
-                        // JSON ထဲက operator name ကို သတ်မှတ်ချက်အတိုင်း ညှိပေးခြင်း
                         let opName = op.name;
                         if(item.operator) {
                             if(item.operator.toUpperCase().includes('MPT')) opName = 'MPT';
@@ -622,15 +617,15 @@
     window.addEventListener('DOMContentLoaded', preloadAllNumbers);
 
 
-    // 🌟 လက်ရှိဖွင့်ထားသော Operator အမျိုးအစားကို မှတ်ထားရန် Variable
     let currentActiveOperator = "ALL"; 
 
-    // 🌟 ၂။ Operator လိုဂိုတစ်ခုချင်းစီကို နှိပ်တဲ့အခါ ပြသပေးမည့် လုပ်ဆောင်ချက်
+    // 🌟 ပြင်ဆင်ပြီးချက် - ပုံနှိပ်လိုက်တာနဲ့ အရေအတွက်ကိုပါ တွက်ချက်ပြသပေးမည့် စနစ်
     function showNumbers(jsonFile, operatorName, event) {
         if(event) event.preventDefault(); 
         
         const modal = document.getElementById('numberModal');
         const modalTitle = document.getElementById('modalTitle');
+        const operatorCount = document.getElementById('operatorCount');
         
         currentActiveOperator = operatorName; 
         
@@ -638,11 +633,14 @@
         modal.style.display = 'flex'; 
 
         const operatorSpecificData = allNumbersData.filter(item => item.operator === operatorName);
+        
+        // 🌟 ခေါင်းစဉ်ဘေးတွင် (စုစုပေါင်း X လုံး) ဆိုပြီး ပေါ်လာအောင် ထည့်သွင်းခြင်း
+        operatorCount.innerText = ` (စုစုပေါင်း ${operatorSpecificData.length} လုံး)`;
+        
         renderNumbers(operatorSpecificData);
     }
 
 
-    // 🌟 ၃။ နံပါတ်များကို UI တွင် HTML Row အဖြစ် ပြသပေးမည့် Function
     function renderNumbers(dataList) {
         const numberList = document.getElementById('numberList');
         numberList.innerHTML = ''; 
@@ -661,7 +659,6 @@
                 ? `<span style="font-size: 11px; background: #222; color: #aaa; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">${item.operator}</span>` 
                 : "";
 
-            // 💡 ပြင်ဆင်ပြီးချက် - '+' သင်္ကေတ ပါလာလျှင် အောက်တစ်ကြောင်းဆင်းရန် သေချာပြင်ထားသည်
             const displayNum = item.number.replace(/\s*\+\s*/g, '<br>');
 
             if (isAlreadyInCart) {
@@ -686,11 +683,11 @@
     }
 
 
-    // 🌟 ၄။ Search Box စနစ်
     let searchTimeout;
 
     function performSearch(targetValue, isFromInsideModal = false) {
         const searchText = targetValue.replace(/[\s\-]/g, '').toLowerCase();
+        const operatorCount = document.getElementById('operatorCount');
 
         if(searchText === "") {
             clearTimeout(searchTimeout);
@@ -699,10 +696,12 @@
             if (isFromInsideModal) {
                 modalTitle.innerText = currentActiveOperator + " ဖုန်းနံပါတ်များ";
                 const originalOperatorData = allNumbersData.filter(item => item.operator === currentActiveOperator);
+                operatorCount.innerText = ` (စုစုပေါင်း ${originalOperatorData.length} လုံး)`;
                 renderNumbers(originalOperatorData);
             } else {
                 modalTitle.innerText = "ဖုန်းနံပါတ် အားလုံး";
                 currentActiveOperator = "ALL";
+                operatorCount.innerText = ` (စုစုပေါင်း ${allNumbersData.length} လုံး)`;
                 renderNumbers(allNumbersData);
             }
             document.getElementById('searchInput').value = "";
@@ -727,6 +726,7 @@
                     const cleanNumber = item.number.replace(/[\s\-]/g, '').toLowerCase();
                     return item.operator === currentActiveOperator && cleanNumber.includes(searchText);
                 });
+                operatorCount.innerText = ` (${filteredData.length} လုံး တွေ့ပါသည်)`;
                 renderNumbers(filteredData);
             } else {
                 currentActiveOperator = "ALL"; 
@@ -735,6 +735,7 @@
                     const cleanNumber = item.number.replace(/[\s\-]/g, '').toLowerCase();
                     return cleanNumber.includes(searchText);
                 });
+                operatorCount.innerText = ` (${filteredData.length} လုံး တွေ့ပါသည်)`;
                 renderNumbers(filteredData);
             }
         }, 300);
@@ -753,11 +754,11 @@
         if(modalId === 'numberModal') {
             document.getElementById('searchInput').value = '';
             document.getElementById('modalSearchInput').value = ''; 
+            document.getElementById('operatorCount').innerText = ''; // Reset static count text
         }
     }
 
 
-    // --- ခြင်းတောင်း Logic များ ---
     function addToCart(number, price, btnElement) {
         const isAlreadyInCart = cart.some(item => item.number === number);
         if (isAlreadyInCart) {
