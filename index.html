@@ -153,7 +153,7 @@
       transform: scale(1.05); 
     }
 
-    /* 📱 ဖုန်းမျက်နှာပြင် (Mobile Screen 600px အောက်) အတွက် သီးသန့်စနစ်များ */
+        /* 📱 ဖုန်းမျက်နှာပြင် (Mobile Screen 600px အောက်) အတွက် သီးသန့်စနစ်များ */
     @media (max-width: 600px) {
       .top-title {
         font-size: 24px; 
@@ -163,13 +163,13 @@
         font-size: 16px; 
       }
       .operator-container {
-        gap: 8px; 
+        gap: 5px; /* ၅ ခုဆန့်အောင် ကွာဟဝေးကို နည်းနည်းလျှော့ပါသည် */
         justify-content: space-between;
         margin-top: 60px;
       }
       .operator-card {
-        width: 22%; /* ဖုန်းထဲတွင် ဘေးတိုက် အစီအစဉ်တကျဖြစ်အောင် ရာခိုင်နှုန်းဖြင့် သေးပေးခြင်း */
-        max-width: 80px;
+        width: 18%; /* ၅ ခုဆန့်အောင် ရာခိုင်နှုန်းကို ၂၂ မှ ၁၈ သို့ လျှော့ပါသည် */
+        max-width: 70px;
       }
     }
 
@@ -444,12 +444,15 @@
     <div class="sub-title">ဖုန်းနံပါတ်အလှရောင်းဝယ်ရေး</div>
   </div>
 
-  <div class="operator-container">
+    <div class="operator-container">
     <img src="MPT.png" alt="MPT Simcard" class="operator-card" onclick="showNumbers('mpt.json', 'MPT', event)">
     <img src="ATOM.png" alt="ATOM Simcard" class="operator-card" onclick="showNumbers('atom.json', 'ATOM', event)">
     <img src="U9.png" alt="U9 Simcard" class="operator-card" onclick="showNumbers('ooredoo.json', 'U9', event)">
     <img src="MYTEL.png" alt="Mytel Simcard" class="operator-card" onclick="showNumbers('mytel.json', 'MYTEL', event)">
+    <!-- အောက်က တစ်ကြောင်း အသစ်ထပ်တိုးပါ -->
+    <img src="same.png" alt="Same Numbers" class="operator-card" onclick="showNumbers('same.json', 'SAME', event)">
   </div>
+
 
   <div class="delivery-track">
     <div class="track-icon">🏪</div>
@@ -537,14 +540,16 @@
     // 🌟 အော်ပရေတာ အားလုံးရဲ့ ဒေတာတွေကို စုသိမ်းထားမည့် Global Array
     let allNumbersData = []; 
 
-    // 🌟 ၁။ ဝက်ဘ်ဆိုက် စပွင့်တာနဲ့ JSON ၄ ခုလုံးကို နောက်ကွယ်ကနေ ကြိုဆွဲထားမည့် Function
+    // 🌟 ၁။ ဝက်ဘ်ဆိုက် စပွင့်တာနဲ့ JSON ၅ ခုလုံးကို နောက်ကွယ်ကနေ ကြိုဆွဲထားမည့် Function
     async function preloadAllNumbers() {
-        const operators = [
+                const operators = [
             { file: 'mpt.json', name: 'MPT' },
             { file: 'atom.json', name: 'ATOM' },
             { file: 'ooredoo.json', name: 'U9' },
-            { file: 'mytel.json', name: 'MYTEL' }
+            { file: 'mytel.json', name: 'MYTEL' },
+            { file: 'same.json', name: 'SAME' } // <-- ဒီတစ်ကြောင်း အသစ်ထပ်တိုးပါ
         ];
+
 
         try {
             const fetchPromises = operators.map(async (op) => {
