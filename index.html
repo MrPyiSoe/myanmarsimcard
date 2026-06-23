@@ -2,7 +2,7 @@
 <html lang="my">
 <head>
   <!-- Vercel Web Analytics -->
-<script defer src="/_vercel/insights/script.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
 
   <link rel="icon" type="image/png" href="/logo.png">
   <link rel="apple-touch-icon" href="/logo.png">
@@ -55,7 +55,7 @@
       height: 100vh;
       background-color: #050505; 
       background-image: 
-        radial-gradient(circle at 50% 50%, rgba(0, 150, 255, 0.15) 0%, transparent 60%),
+        radial-gradient(circle at 50% 50%, rgba(0, 150, 255, 0.15 ) 0%, transparent 60%),
         linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
       background-size: 100% 100%, 35px 35px, 35px 35px;
@@ -126,12 +126,12 @@
       line-height: 1.5;
     }
 
-    /* 🌟 Operator ၄ ခုကို PC တွင် ဘေးတိုက်၊ ဖုန်းတွင် အချိုးကျ သေးပေးမည့် Responsive စနစ် 🌟 */
+    /* 🌟 Operator ၅ ခုကို PC တွင် ဘေးတိုက်၊ ဖုန်းတွင် အချိုးကျ သေးပေးမည့် Responsive စနစ် 🌟 */
     .operator-container {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 80px; /* 👈 PC ပေါ်တွင် ပုံတစ်ပုံနှင့်တစ်ပုံ ကြားအကွာအဝေးကို 20px မှ 40px သို့ တိုးချဲလိုက်ပါသည် */
+      gap: 40px; 
       margin-top: 100px;
       width: 100%;
       max-width: 900px;
@@ -141,7 +141,7 @@
     }
 
     .operator-card {
-      width: 160px; /* PC ပေါ်တွင် အရွယ်အစား တော်တော်လေး လှလှပပ ပေါ်မည် */
+      width: 140px; 
       height: auto;
       border-radius: 20px; 
       box-shadow: 0 10px 30px rgba(0, 150, 255, 0.2); 
@@ -153,7 +153,7 @@
       transform: scale(1.05); 
     }
 
-        /* 📱 ဖုန်းမျက်နှာပြင် (Mobile Screen 600px အောက်) အတွက် သီးသန့်စနစ်များ */
+    /* 📱 ဖုန်းမျက်နှာပြင် (Mobile Screen 600px အောက်) အတွက် သီးသန့်စနစ်များ */
     @media (max-width: 600px) {
       .top-title {
         font-size: 24px; 
@@ -163,12 +163,12 @@
         font-size: 16px; 
       }
       .operator-container {
-        gap: 5px; /* ၅ ခုဆန့်အောင် ကွာဟဝေးကို နည်းနည်းလျှော့ပါသည် */
+        gap: 5px; 
         justify-content: space-between;
         margin-top: 60px;
       }
       .operator-card {
-        width: 18%; /* ၅ ခုဆန့်အောင် ရာခိုင်နှုန်းကို ၂၂ မှ ၁၈ သို့ လျှော့ပါသည် */
+        width: 18%; 
         max-width: 70px;
       }
     }
@@ -300,6 +300,7 @@
       font-size: 18px;
       font-weight: bold;
       letter-spacing: 1px;
+      line-height: 1.4;
     }
 
     .price-text {
@@ -444,15 +445,13 @@
     <div class="sub-title">ဖုန်းနံပါတ်အလှရောင်းဝယ်ရေး</div>
   </div>
 
-    <div class="operator-container">
-    <img src="MPT.png" alt="MPT Simcard" class="operator-card" onclick="showNumbers('mpt.json', 'MPT', event)">
+  <div class="operator-container">
+    <img src="MPT.png" alt="MPT Simcard" class="operator-card" onclick="showNumbers('mpt.json', 'MPT', event )">
     <img src="ATOM.png" alt="ATOM Simcard" class="operator-card" onclick="showNumbers('atom.json', 'ATOM', event)">
     <img src="U9.png" alt="U9 Simcard" class="operator-card" onclick="showNumbers('ooredoo.json', 'U9', event)">
     <img src="MYTEL.png" alt="Mytel Simcard" class="operator-card" onclick="showNumbers('mytel.json', 'MYTEL', event)">
-    <!-- အောက်က တစ်ကြောင်း အသစ်ထပ်တိုးပါ -->
     <img src="same.png" alt="Same Numbers" class="operator-card" onclick="showNumbers('same.json', 'SAME', event)">
   </div>
-
 
   <div class="delivery-track">
     <div class="track-icon">🏪</div>
@@ -474,7 +473,7 @@
       <div class="modal-header" style="flex-direction: column; align-items: flex-start; gap: 8px; width: 100%; box-sizing: border-box;">
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
           <h2 id="modalTitle" class="modal-title" style="font-size: 16px;">ဖုန်းနံပါတ်များ</h2>
-          <span class="close-btn" onclick="closeModal('numberModal')">&times;</span>
+          <span class="close-btn" onclick="closeModal('numberModal' )">&times;</span>
         </div>
         <div style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid #444; border-radius: 10px; padding: 6px 12px; width: 93%; margin-top: 5px;">
           <span style="font-size: 14px;">🔍</span>
@@ -533,7 +532,6 @@
 
     </div>
   </div>
-
   <script>
     let cart = []; 
     
@@ -542,14 +540,13 @@
 
     // 🌟 ၁။ ဝက်ဘ်ဆိုက် စပွင့်တာနဲ့ JSON ၅ ခုလုံးကို နောက်ကွယ်ကနေ ကြိုဆွဲထားမည့် Function
     async function preloadAllNumbers() {
-                const operators = [
+        const operators = [
             { file: 'mpt.json', name: 'MPT' },
             { file: 'atom.json', name: 'ATOM' },
             { file: 'ooredoo.json', name: 'U9' },
             { file: 'mytel.json', name: 'MYTEL' },
-            { file: 'same.json', name: 'SAME' } // <-- ဒီတစ်ကြောင်း အသစ်ထပ်တိုးပါ
+            { file: 'same.json', name: 'SAME' } // <-- same.json ပါဝင်ပြီးသားပါ
         ];
-
 
         try {
             const fetchPromises = operators.map(async (op) => {
@@ -601,7 +598,7 @@
     }
 
 
-        // 🌟 ၃။ နံပါတ်များကို UI တွင် HTML Row အဖြစ် ပြသပေးမည့် Function
+    // 🌟 ၃။ နံပါတ်များကို UI တွင် HTML Row အဖြစ် ပြသပေးမည့် Function
     function renderNumbers(dataList) {
         const numberList = document.getElementById('numberList');
         numberList.innerHTML = ''; 
@@ -645,7 +642,6 @@
             numberList.appendChild(row);
         });
     }
-
 
 
     // 🌟 ၄။ Search Box စနစ် (စာသားဖျက်သော်လည်း မူလနံပါတ်များ ပြန်ပေါ်လာပြီး Modal ဆက်ရှိနေမည့် စနစ်သစ်)
@@ -743,7 +739,7 @@
         }
     }
 
-        function showCartModal() {
+    function showCartModal() {
         const modal = document.getElementById('cartModal');
         const cartList = document.getElementById('cartList');
         const cartTotal = document.getElementById('cartTotal');
@@ -779,7 +775,6 @@
         }
         modal.style.display = 'flex';
     }
-
 
     function removeFromCart(index) {
         cart.splice(index, 1); 
@@ -850,7 +845,7 @@
         if (event.target == cartModal) cartModal.style.display = "none";
         if (event.target == checkoutModal) checkoutModal.style.display = "none";
     }
-</script>
+  </script>
 
 </body>
 </html>
