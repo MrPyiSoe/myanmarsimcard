@@ -151,7 +151,26 @@
     .operator-card:hover {
       transform: scale(1.05); 
     }
+/* 🌟 အောက်ဆုံးက မူပိုင်ခွင့်စာသား (Footer) အတွက် Style 🌟 */
+    .site-footer {
+      position: absolute;
+      bottom: 8px; /* အောက်ခြေကပ်နေစေရန် */
+      width: 100%;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.4); /* စာသားကို ခပ်မှိန်မှိန်လေး ဖြစ်စေရန် */
+      font-size: 11px; /* စာသားအသေးလေး */
+      letter-spacing: 0.5px;
+      z-index: 5;
+      pointer-events: none; /* တခြားအရာတွေကို နှိပ်ရတာ မပိတ်ဆို့စေရန် */
+    }
 
+    /* ဖုန်းပေါ်တွင် စာသား ပိုအဆင်ပြေစေရန် */
+    @media (max-width: 600px) {
+      .site-footer {
+        font-size: 10px;
+        bottom: 5px;
+      }
+    }
     /* 📱 ဖုန်းမျက်နှာပြင် (Mobile Screen 600px အောက်) အတွက် သီးသန့်စနစ်များ */
     @media (max-width: 600px) {
       .top-title {
@@ -472,7 +491,10 @@
     </div>
     <div class="track-icon">🏠</div>
   </div>
-
+<!-- 🌟 အောက်ဆုံး မူပိုင်ခွင့်စာသား 🌟 -->
+  <div class="site-footer">
+    &copy; 2021 - 2026 Myanmar Beauty Sim Store. All Rights Reserved.
+  </div>
   <div id="numberModal" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header" style="flex-direction: column; align-items: flex-start; gap: 8px; width: 100%; box-sizing: border-box;">
