@@ -601,7 +601,7 @@
     }
 
 
-    // 🌟 ၃။ နံပါတ်များကို UI တွင် HTML Row အဖြစ် ပြသပေးမည့် Function
+        // 🌟 ၃။ နံပါတ်များကို UI တွင် HTML Row အဖြစ် ပြသပေးမည့် Function
     function renderNumbers(dataList) {
         const numberList = document.getElementById('numberList');
         numberList.innerHTML = ''; 
@@ -620,10 +620,15 @@
                 ? `<span style="font-size: 11px; background: #222; color: #aaa; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">${item.operator}</span>` 
                 : "";
 
+            // 💡 '+' သင်္ကေတ ပါလာလျှင် အောက်တစ်ကြောင်းဆင်းရန်   
+ ဖြင့် အစားထိုးခြင်း
+            const displayNum = item.number.replace(/\s*\+\s*/g, '  
+');
+
             if (isAlreadyInCart) {
                 row.innerHTML = `
                     <div class="num-info">
-                        <span class="num-text">${item.number} ${opBadge}</span>
+                        <span class="num-text">${displayNum} ${opBadge}</span>
                         <span class="price-text">${item.price}</span>
                     </div>
                     <button class="buy-btn" style="background: #555; cursor: not-allowed; box-shadow: none;" disabled>ရွေးပြီး</button>
@@ -631,7 +636,7 @@
             } else {
                 row.innerHTML = `
                     <div class="num-info">
-                        <span class="num-text">${item.number} ${opBadge}</span>
+                        <span class="num-text">${displayNum} ${opBadge}</span>
                         <span class="price-text">${item.price}</span>
                     </div>
                     <button onclick="addToCart('${item.number}', '${item.price}', this)" class="buy-btn">Buy</button>
@@ -640,6 +645,7 @@
             numberList.appendChild(row);
         });
     }
+
 
 
     // 🌟 ၄။ Search Box စနစ် (စာသားဖျက်သော်လည်း မူလနံပါတ်များ ပြန်ပေါ်လာပြီး Modal ဆက်ရှိနေမည့် စနစ်သစ်)
@@ -737,7 +743,7 @@
         }
     }
 
-    function showCartModal() {
+        function showCartModal() {
         const modal = document.getElementById('cartModal');
         const cartList = document.getElementById('cartList');
         const cartTotal = document.getElementById('cartTotal');
@@ -753,11 +759,16 @@
                 let priceNum = parseInt(item.price.replace(/,/g, '').replace(' Ks', ''));
                 if(!isNaN(priceNum)) totalAmount += priceNum;
 
+                // 💡 ခြင်းတောင်းထဲတွင်လည်း '+' ကို   
+ ဖြင့် အစားထိုးခြင်း
+                const displayNum = item.number.replace(/\s*\+\s*/g, '  
+');
+
                 const row = document.createElement('div');
                 row.className = 'number-row';
                 row.innerHTML = `
                     <div class="num-info">
-                        <span class="num-text">${item.number}</span>
+                        <span class="num-text">${displayNum}</span>
                         <span class="price-text">${item.price}</span>
                     </div>
                     <button onclick="removeFromCart(${index})" class="buy-btn remove-btn">ဖျက်မည်</button>
@@ -768,6 +779,7 @@
         }
         modal.style.display = 'flex';
     }
+
 
     function removeFromCart(index) {
         cart.splice(index, 1); 
