@@ -161,29 +161,20 @@
       .sub-title {
         font-size: 16px; 
       }
-      /* 🌟 ဖုန်းပေါ်တွင် အော်ပရေတာပုံများကို အပေါ် ၃ ခု၊ အောက် ၂ ခု ပေါ်စေမည့် Grid စနစ် 🌟 */
+      /* 🌟 ဖုန်းပေါ်တွင် အော်ပရေတာပုံများကို အပေါ် ၃ ခု၊ အောက် ၂ ခု ညီညာစွာ ခေါက်ချမည့်စနစ် 🌟 */
       .operator-container {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr); /* ကော်လံ ၃ ခု အညီအမျှခွဲခြင်း */
+        display: flex;
+        flex-wrap: wrap; /* ပုံများဆံ့အောင် အောက်တန်းသို့ အလိုအလျောက် ဆင်းစေခြင်း */
+        justify-content: center; /* ပုံအားလုံးကို အလယ်တည့်တည့် ညှိခြင်း */
         gap: 15px; /* ပုံတစ်ပုံချင်းစီရဲ့ ကြားအကွာအဝေး */
-        justify-items: center;
         margin-top: 60px;
-        padding: 0 20px;
-      }
-      /* စတုတ္ထမြောက်နှင့် ပဉ္စမမြောက်ပုံ (အောက်တန်းက ၂ ခု) ကို အလယ်တည့်တည့် ရောက်အောင် ချိန်ခြင်း */
-      .operator-card:nth-child(4) {
-        grid-column: 1 / span 2;
-        justify-self: right;
-        margin-right: -7px;
-      }
-      .operator-card:nth-child(5) {
-        grid-column: 2 / span 2;
-        justify-self: left;
-        margin-left: -7px;
+        padding: 0 15px;
+        max-width: 340px; /* အတန်းလိုက် ၃ ခုပဲ ဆံ့စေရန် အကျယ်ကို ထိန်းထားခြင်း */
       }
       .operator-card {
-        width: 100%; 
-        max-width: 85px; /* ဖုန်းပေါ်တွင် ပုံအရွယ်အစား မကြီးမသေး ကွက်တိဖြစ်အောင် ထိန်းထားခြင်း */
+        width: 28%; /* အပေါ်တန်းတွင် ၃ ခု ကွက်တိ ပေါ်စေရန် အချိုးချခြင်း */
+        max-width: 85px; 
+        height: auto;
       }
     }
 
