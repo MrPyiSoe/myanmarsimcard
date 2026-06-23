@@ -438,6 +438,62 @@
     textarea.form-input {
       resize: none;
     }
+    /* Footer Social & Contact Section */
+    .footer-contact-container {
+      position: absolute;
+      bottom: 45px; /* Copyright ရဲ့ အပေါ်နားမှာ ပေါ်စေရန် */
+      width: 100%;
+      text-align: center;
+      z-index: 10;
+      padding: 0 15px;
+      box-sizing: border-box;
+    }
+
+    .footer-social-links {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .footer-icon-link {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      transition: transform 0.2s ease;
+    }
+
+    .footer-icon-link:hover {
+      transform: scale(1.1);
+    }
+
+    .footer-icon-img {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+    }
+
+    .footer-phone-text {
+      color: #0096ff;
+      font-size: 15px;
+      font-weight: bold;
+      margin-left: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Mobile Screen အရွယ်အစားအတွက် အနည်းငယ် ချိန်ညှိခြင်း */
+    @media (max-width: 600px) {
+      .footer-contact-container {
+        bottom: 35px;
+      }
+      .footer-phone-text {
+        font-size: 14px;
+      }
+      .footer-social-links {
+        gap: 12px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -487,6 +543,28 @@
       </svg>
     </div>
     <div class="track-icon">🏠</div>
+  </div>
+
+  <!-- ဆက်သွယ်ရန် လင့်ခ်များနှင့် ဖုန်းနံပါတ် စာစုလေး -->
+  <div class="footer-contact-container">
+    <div class="footer-social-links">
+      <a href="https://www.facebook.com/profile.php?id=100088389424106" target="_blank" class="footer-icon-link" title="Facebook">
+        <img src="facebook.png" alt="Facebook" class="footer-icon-img">
+      </a>
+      <a href="https://www.instagram.com/myanmar_beauty_sim/" target="_blank" class="footer-icon-link" title="Instagram">
+        <img src="instagram.png" alt="Instagram" class="footer-icon-img">
+      </a>
+      <a href="https://t.me/mmbsim" target="_blank" class="footer-icon-link" title="Telegram">
+        <img src="indigo.png" alt="Telegram" class="footer-icon-img" style="display: none;" onerror="this.src='telegram.png'; this.style.display='block';"> <!-- fallback for repo naming -->
+      </a>
+      <a href="viber://chat?number=%2B959895588887" class="footer-icon-link" title="Viber">
+        <img src="viber.png" alt="Viber" class="footer-icon-img">
+      </a>
+      <a href="tel:+959895588887" class="footer-icon-link" title="Call Now">
+        <img src="phone.png" alt="Phone" class="footer-icon-img">
+        <span class="footer-phone-text">09 8955 8888 7</span>
+      </a>
+    </div>
   </div>
 
   <div class="site-footer">
