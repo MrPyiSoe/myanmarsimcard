@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="my">
 <head>
-  <!-- Vercel Web Analytics -->
   <script defer src="/_vercel/insights/script.js"></script>
 
   <link rel="icon" type="image/png" href="/logo.png">
@@ -532,6 +531,7 @@
 
     </div>
   </div>
+
   <script>
     let cart = []; 
     
@@ -545,7 +545,7 @@
             { file: 'atom.json', name: 'ATOM' },
             { file: 'ooredoo.json', name: 'U9' },
             { file: 'mytel.json', name: 'MYTEL' },
-            { file: 'same.json', name: 'SAME' } // <-- same.json ပါဝင်ပြီးသားပါ
+            { file: 'same.json', name: 'SAME' }
         ];
 
         try {
@@ -553,7 +553,18 @@
                 try {
                     const response = await fetch(op.file + '?t=' + new Date().getTime());
                     const data = await response.json();
-                    return data.map(item => ({ ...item, operator: op.name }));
+                    return data.map(item => {
+                        // JSON ထဲက operator name ကို သတ်မှတ်ချက်အတိုင်း ညှိပေးခြင်း
+                        let opName = op.name;
+                        if(item.operator) {
+                            if(item.operator.toUpperCase().includes('MPT')) opName = 'MPT';
+                            else if(item.operator.toUpperCase().includes('ATOM')) opName = 'ATOM';
+                            else if(item.operator.toUpperCase().includes('OOREDOO') || item.operator.toUpperCase() === 'U9') opName = 'U9';
+                            else if(item.operator.toUpperCase().includes('MYTEL')) opName = 'MYTEL';
+                            else if(item.operator.toUpperCase().includes('SAME')) opName = 'SAME';
+                        }
+                        return { ...item, operator: opName };
+                    });
                 } catch (e) {
                     console.error(`${op.name} ဒေတာဆွဲရတာ အဆင်မပြေပါ - `, e);
                     return [];
@@ -617,10 +628,8 @@
                 ? `<span style="font-size: 11px; background: #222; color: #aaa; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">${item.operator}</span>` 
                 : "";
 
-            // 💡 '+' သင်္ကေတ ပါလာလျှင် အောက်တစ်ကြောင်းဆင်းရန်   
- ဖြင့် အစားထိုးခြင်း
-            const displayNum = item.number.replace(/\s*\+\s*/g, '  
-');
+            // 💡 ပြင်ဆင်ပြီးချက် - '+' သင်္ကေတ ပါလာလျှင် အောက်တစ်ကြောင်းဆင်းရန် သေချာပြင်ထားသည်
+            const displayNum = item.number.replace(/\s*\+\s*/g, '<br>');
 
             if (isAlreadyInCart) {
                 row.innerHTML = `
@@ -644,13 +653,12 @@
     }
 
 
-    // 🌟 ၄။ Search Box စနစ် (စာသားဖျက်သော်လည်း မူလနံပါတ်များ ပြန်ပေါ်လာပြီး Modal ဆက်ရှိနေမည့် စနစ်သစ်)
+    // 🌟 ၄။ Search Box စနစ်
     let searchTimeout;
 
     function performSearch(targetValue, isFromInsideModal = false) {
         const searchText = targetValue.replace(/[\s\-]/g, '').toLowerCase();
 
-        // 💡 စာသားများ ပြန်ဖျက်လိုက်၍ ကွက်လပ်ဖြစ်သွားလျှင် Box မပိတ်ဘဲ မူလဒေတာများ ပြန်ပြမည်
         if(searchText === "") {
             clearTimeout(searchTimeout);
             const modalTitle = document.getElementById('modalTitle');
@@ -660,12 +668,10 @@
                 const originalOperatorData = allNumbersData.filter(item => item.operator === currentActiveOperator);
                 renderNumbers(originalOperatorData);
             } else {
-                // အပြင်ကနေ ဖျက်တာဖြစ်ပြီး Modal ဖွင့်ထားဆဲဆိုရင် နံပါတ်အားလုံး ပြန်ပြမည်
                 modalTitle.innerText = "ဖုန်းနံပါတ် အားလုံး";
                 currentActiveOperator = "ALL";
                 renderNumbers(allNumbersData);
             }
-            // Box ၂ ခုလုံးကို စာသားရှင်းပေးခြင်း
             document.getElementById('searchInput').value = "";
             document.getElementById('modalSearchInput').value = "";
             return;
@@ -709,7 +715,6 @@
         performSearch(e.target.value, true);
     });
 
-    // Modal ပိတ်လျှင် Input များကို ရှင်းပေးသည့် စနစ်
     function closeModal(modalId) {
         document.getElementById(modalId).style.display = 'none';
         if(modalId === 'numberModal') {
@@ -755,10 +760,7 @@
                 let priceNum = parseInt(item.price.replace(/,/g, '').replace(' Ks', ''));
                 if(!isNaN(priceNum)) totalAmount += priceNum;
 
-                // 💡 ခြင်းတောင်းထဲတွင်လည်း '+' ကို   
- ဖြင့် အစားထိုးခြင်း
-                const displayNum = item.number.replace(/\s*\+\s*/g, '  
-');
+                const displayNum = item.number.replace(/\s*\+\s*/g, '<br>');
 
                 const row = document.createElement('div');
                 row.className = 'number-row';
