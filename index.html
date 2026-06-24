@@ -778,18 +778,17 @@
         fetchOrderHistory(); 
     }
 
-    // 🛠️ ပြင်ဆင်ပြီးချက် (၂) - အော်ဒါမှတ်တမ်းကို လူတိုင်း ဖတ်ခွင့်ရအောင် စိတ်ချရဆုံး ပုံစံပြောင်းလဲခြင်း
-    async function fetchOrderHistory() {
+        async function fetchOrderHistory() {
         const historyList = document.getElementById('historyList');
         if (!currentUser) return;
 
         try {
-            // 🛠️ ဒီနေရာမှာလည်း supabaseClient လို့ ကွက်တိ ပြောင်းလဲထားပါတယ်ဗျာ
+            // 🌟 အီးမေးလ်နဲ့ စစ်တာကို ဖြုတ်လိုက်ပြီး၊ ဒေတာဘေ့စ်ထဲက အော်ဒါအားလုံးကို ဆွဲယူပြသပါမည်
             const { data, error } = await supabaseClient 
                 .from('orders') 
                 .select('*')
                 .order('created_at', { ascending: false });
-                
+
             if (error) throw error;
 
             if (!data || data.length === 0) {
@@ -802,12 +801,12 @@
                 html += `
                     <div style="background: rgba(255,255,255,0.05); border: 1px solid #333; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 13px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                            <span style="color: #0096ff; font-weight: bold;">🆔 Order #:${order.id}</span>
+                            <span style="color: #0096ff; font-weight: bold;">🆔 Order #:${order.id || '-'}</span>
                             <span style="color: #aaa;">${new Date(order.created_at).toLocaleDateString()}</span>
                         </div>
                         <div style="color: #fff; margin-bottom: 4px;">👤 အမည်: <strong style="color: #fff;">${order.customer_name || '-'}</strong></div>
-                        <div style="color: #ccc; margin-bottom: 4px;">💰 စစုပေါင်းကျသင့်ငွေ: <strong style="color: #ffcc00;">${order.total_price || '0'}</strong> ကျပ်</div>
-                        <div style="color: #aaa; font-size: 12px; margin-top: 4px;">📍 ပို့ဆောင်မည့်လိပ်စာ: ${order.customer_address || '-'}</div>
+                        <div style="color: #ccc; margin-bottom: 4px;">💰 စုစုပေါင်း: <strong style="color: #ffcc00;">${order.total_price || '0'}</strong></div>
+                        <div style="color: #aaa; font-size: 12px; margin-top: 4px;">📍 လိပ်စာ: ${order.customer_address || '-'}</div>
                     </div>
                 `;
             });
@@ -815,9 +814,10 @@
 
         } catch (error) {
             console.error('Fetch History Error:', error);
-            historyList.innerHTML = `<p style="color: #ff4d4d; text-align: center; margin: 20px 0;">⚠️ Error: ${error.message || 'ဒေတာဘေ့စ် ချိတ်ဆက်မှု အဆင်မပြေပါ'}</p>`;
+            historyList.innerHTML = `<p style="color: #ff4d4d; text-align: center; margin: 20px 0;">⚠️ Error: ${error.message}</p>`;
         }
     }
+
     async function handleLogout() {
         try {
             const { error } = await supabaseClient.auth.signOut();
