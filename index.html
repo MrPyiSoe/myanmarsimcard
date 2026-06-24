@@ -494,6 +494,13 @@
         gap: 12px;
       }
     }
+    #memberBtn, [onclick="openMemberModal()"] {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        white-space: nowrap !important; /* စာသားကို အောက်ကြောင်း လုံးဝ မဆင်းစေရန် */
+        gap: 6px;                       /* လူပုံနဲ့ စာသားကြား အကွာအဝေး */
+    }
   </style> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
