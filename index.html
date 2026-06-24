@@ -823,20 +823,35 @@ async function fetchOrderHistory() {
         if (!currentUser) return;
 
         try {
+            // 🌟 user_email တွေ သုံးပြီး စစ်တာကို လုံးဝ ဖယ်ထုတ်လိုက်ပါပြီ
+            // 🌟 အစ်ကို့ Table ထဲက customer_name နဲ့ တိုက်ရိုက် ချိတ်ဆက်ပြီး ဆွဲထုတ်ပါမယ်
             const { data, error } = await supabaseClient 
                 .from('orders') 
                 .select('*')
-                .order('created_at', { ascending: false }); // 👈 အားလုံးကို အရင်ဆွဲတင်ခိုင်းကြည့်တာပါ
+                .eq('customer_name', currentUser.email); // 👈 ယာယီအားဖြင့် အလုပ်လုပ်၊ မလုပ် အရင်စမ်းသပ်ရန်
 
-            if (error) throw error;
+            if (error) {
+                // တကယ်လို့ customer_name နဲ့ စစ်လို့ Error တက်ရင် အောက်ကအတိုင်း Table တစ်ခုလုံးကို ဆွဲချခိုင်းပါမယ်
+                const { data: allData, error: allError } = await supabaseClient
+                    .from('orders')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (allError) throw allError;
+                var finalData = allData;
+            } else {
+                var finalData = data;
+            }
 
-            if (!data || data.length === 0) {
-                historyList.innerHTML = `<p style="color: #aaa; text-align: center; margin: 20px 0;">ဝယ်ယူမှုမှတ်တမ်း မရှိသေးပါဗျာ။</p>`;
+            // အော်ဒါ လုံးဝမရှိသေးရင် ပေါ်မယ့်စာသား
+            if (!finalData || finalData.length === 0) {
+                historyList.innerHTML = `<p style="color: #aaa; text-align: center; margin: 20px 0;">🛒 ဝယ်ယူမှုမှတ်တမ်း မရှိသေးပါဗျာ။</p>`;
                 return;
             }
 
+            // အော်ဒါရှိရင် လှလှပပ ပြသပေးမည့်အပိုင်း
             let html = '';
-            data.forEach(order => {
+            finalData.forEach(order => {
                 html += `
                     <div style="background: rgba(255,255,255,0.05); border: 1px solid #333; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 13px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
@@ -853,7 +868,8 @@ async function fetchOrderHistory() {
 
         } catch (error) {
             console.error('Fetch History Error:', error);
-            historyList.innerHTML = `<p style="color: #ff4d4d; text-align: center; margin: 20px 0;">မှတ်တမ်းဆွဲယူရာတွင် အမှားအယွင်းရှိပါသည်</p>`;
+            // Error ဆက်တက်နေရင် ဘာ Error လဲဆိုတာ စာမျက်နှာပေါ်မှာ တစ်ခါတည်း မြင်ရအောင် ပြခိုင်းထားပါတယ် အစ်ကို
+            historyList.innerHTML = `<p style="color: #ff4d4d; text-align: center; margin: 20px 0;">⚠️ Error: ${error.message || 'ဒေတာဘေ့စ် ချိတ်ဆက်မှု အဆင်မပြေပါ'}</p>`;
         }
     }
 
