@@ -689,9 +689,11 @@
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentUser = null; // လက်ရှိ Login ဝင်ထားတဲ့ User ကို မှတ်သားရန် ဗေရီယေဘယ်လ်
+
+    // 🛠️ ပြင်ဆင်ပြီးချက် (၁) - supabase နေရာတွင် supabaseClient သို့ ကွက်တိပြောင်းလဲခြင်း
     async function checkUserSession() {
         if (!supabaseClient) return;
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession(); // 👈 ပြင်ဆင်ပြီး
         if (session) {
             currentUser = session.user;
             document.getElementById('memberBtnText').innerText = "👤 My Profile";
@@ -754,7 +756,6 @@
 // 🌟 ဤနေရာတွင် အောက်က ဖန်ရှင်အသစ်တွေကို ကူးပြီး ညှပ်ထည့်ပေးပါ အစ်ကို
     function openMemberModal() {
         document.getElementById('memberModal').style.display = 'flex';
-        // အကယ်၍ အကောင့်ဝင်ထားပြီးသားဆိုရင် ဝယ်ယူမှုမှတ်တမ်းကို တန်းပြပေးရန်
         if (currentUser) {
             showProfileDashboard();
         } else {
@@ -768,7 +769,6 @@
         document.getElementById('profileSection').style.display = 'none';
     }
 
-    // 🌟 အပေါ်က ဖန်ရှင်အပိတ်ပြီးတာနဲ့ ဒီအတိုင်း စီတန်းပြီး လာရပါမယ်ဗျာ
     function showProfileDashboard() {
         document.getElementById('memberModalTitle').innerText = "လူကြီးမင်း၏ Profile";
         document.getElementById('authSection').style.display = 'none';
@@ -777,31 +777,46 @@
         fetchOrderHistory(); 
     }
 
-    async function handleAuth(type) {
-        const email = document.getElementById('memberEmail').value.trim();
-        const password = document.getElementById('memberPassword').value;
-
-        if (!email || !password) {
-            alert('အီးမေးလ် နှင့် လျှို့ဝှက်နံပါတ်ကို ပြည့်စုံစွာ ဖြည့်ပေးပါဗျာ။');
-            return;
-        }
+    // 🛠️ ပြင်ဆင်ပြီးချက် (၂) - အော်ဒါမှတ်တမ်းကို လူတိုင်း ဖတ်ခွင့်ရအောင် စိတ်ချရဆုံး ပုံစံပြောင်းလဲခြင်း
+    async function fetchOrderHistory() {
+        const historyList = document.getElementById('historyList');
+        if (!currentUser) return;
 
         try {
-            if (type === 'signup') {
-                const { data, error } = await supabaseClient.auth.signUp({ email, password });
-                if (error) throw error;
-                alert('အကောင့်ဖွင့်ခြင်း အောင်မြင်ပါသည်။ အီးမေးလ်ထဲသို့ Verification Link ပို့ထားပါက Confirm လုပ်ပေးပါဗျာ။');
-            } else {
-                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-                if (error) throw error;
-                currentUser = data.user;
-                document.getElementById('memberBtnText').innerText = "👤 My Profile";
-                showProfileDashboard();
-                alert('Login ဝင်ရောက်ခြင်း အောင်မြင်ပါသည်ဗျာ။');
+            // RLS ဖွင့်ထားတာရော၊ ပိတ်ထားတာရော အားလုံးအတွက် လှမ်းဖတ်ရတာ သေချာစေရန်
+            const { data, error } = await supabaseClient 
+                .from('orders') 
+                .select('*')
+                .order('created_at', { ascending: false });
+                
+            if (error) throw error;
+
+            // အော်ဒါ လုံးဝမရှိသေးရင် ပေါ်မယ့်စာသား
+            if (!data || data.length === 0) {
+                historyList.innerHTML = `<p style="color: #aaa; text-align: center; margin: 20px 0;">🛒 ဝယ်ယူမှုမှတ်တမ်း မရှိသေးပါဗျာ။</p>`;
+                return;
             }
+
+            // အော်ဒါရှိရင် လှလှပပ ပြသပေးမည့်အပိုင်း
+            let html = '';
+            data.forEach(order => {
+                html += `
+                    <div style="background: rgba(255,255,255,0.05); border: 1px solid #333; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 13px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #0096ff; font-weight: bold;">🆔 Order #:${order.id}</span>
+                            <span style="color: #aaa;">${new Date(order.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <div style="color: #fff; margin-bottom: 4px;">👤 အမည်: <strong style="color: #fff;">${order.customer_name || '-'}</strong></div>
+                        <div style="color: #ccc; margin-bottom: 4px;">💰 စုစုပေါင်းကျသင့်ငွေ: <strong style="color: #ffcc00;">${order.total_price || '0'}</strong> ကျပ်</div>
+                        <div style="color: #aaa; font-size: 12px; margin-top: 4px;">📍 ပို့ဆောင်မည့်လိပ်စာ: ${order.customer_address || '-'}</div>
+                    </div>
+                `;
+            });
+            historyList.innerHTML = html;
+
         } catch (error) {
-            console.error('Auth Error:', error);
-            alert('အမှားအယွင်းရှိပါသည်: ' + error.message);
+            console.error('Fetch History Error:', error);
+            historyList.innerHTML = `<p style="color: #ff4d4d; text-align: center; margin: 20px 0;">⚠️ Error: ${error.message || 'ဒေတာဘေ့စ် ချိတ်ဆက်မှု အဆင်မပြေပါ'}</p>`;
         }
     }
 
