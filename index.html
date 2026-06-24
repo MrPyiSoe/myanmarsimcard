@@ -678,11 +678,11 @@
 // 🌟 ၎င်းစာကြောင်းရဲ့ အောက်တည့်တည့်မှာ ဒီကုဒ်ကို ကူးပြီး ထည့်ပေးပါ အစ်ကို
     const SUPABASE_URL = "https://kwkbrfxaaoovdxvzppqy.supabase.co"; // အစ်ကို့ Supabase URL ထည့်ရန်
     const SUPABASE_ANON_KEY = "sb_publishable_XQ56SyFAXMywsrnHHT2r7A_ddrMRjMv";      // အစ်ကို့ Supabase Anon Key ထည့်ရန်
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentUser = null; // လက်ရှိ Login ဝင်ထားတဲ့ User ကို မှတ်သားရန် ဗေရီယေဘယ်လ်
     async function checkUserSession() {
-        if (!supabase) return;
+        if (!supabaseClient) return;
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
             currentUser = session.user;
@@ -780,11 +780,11 @@
 
         try {
             if (type === 'signup') {
-                const { data, error } = await supabase.auth.signUp({ email, password });
+                const { data, error } = await supabaseClient.auth.signUp({ email, password });
                 if (error) throw error;
                 alert('အကောင့်ဖွင့်ခြင်း အောင်မြင်ပါသည်။ အီးမေးလ်ထဲသို့ Verification Link ပို့ထားပါက Confirm လုပ်ပေးပါဗျာ။');
             } else {
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
                 if (error) throw error;
                 currentUser = data.user;
                 document.getElementById('memberBtnText').innerText = "👤 My Profile";
@@ -799,7 +799,7 @@
 
     async function handleLogout() {
         try {
-            const { error } = await supabase.auth.signOut();
+            const { error } = await supabaseClient.auth.signOut();
             if (error) throw error;
             currentUser = null;
             document.getElementById('memberBtnText').innerText = "👤 Member";
@@ -817,7 +817,7 @@ async function fetchOrderHistory() {
         try {
             // Supabase ရှိ 'orders' table ထဲကနေ လက်ရှိ user ရဲ့ email နဲ့ ကိုက်ညီတဲ့ data တွေကို ဆွဲယူခြင်း
             // Note: အစ်ကို့ database ထဲက table နာမည် သို့မဟုတ် ကော်လံနာမည် ကွဲပြားရင် ဒါလေး ပြန်ပြင်ရပါမယ်
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('orders') 
                 .select('*')
                 .eq('user_email', currentUser.email) // user ရဲ့ အော်ဒါတွေကို စစ်ထုတ်ခြင်း
