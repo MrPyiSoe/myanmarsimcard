@@ -778,12 +778,11 @@
         fetchOrderHistory(); 
     }
 
-        async function fetchOrderHistory() {
+            async function fetchOrderHistory() {
         const historyList = document.getElementById('historyList');
         if (!currentUser) return;
 
         try {
-            // 🌟 အီးမေးလ်နဲ့ စစ်တာကို ဖြုတ်လိုက်ပြီး၊ ဒေတာဘေ့စ်ထဲက အော်ဒါအားလုံးကို ဆွဲယူပြသပါမည်
             const { data, error } = await supabaseClient 
                 .from('orders') 
                 .select('*')
@@ -798,6 +797,21 @@
 
             let html = '';
             data.forEach(order => {
+                
+                // 🌟 Status ပေါ်မူတည်ပြီး စာသားပြောင်းလဲပေးမည့် အပိုင်း
+                let statusText = '';
+                // ဒေတာဘေ့စ်ထဲက status က 'confirmed' ဖြစ်နေရင် (သို့) Telegram က Confirm နှိပ်ပြီးရင်
+                if (order.status === 'confirmed') {
+                    statusText = `<div style="background: rgba(40, 167, 69, 0.1); color: #28a745; padding: 8px; border-radius: 5px; margin-top: 8px; font-size: 12px; font-weight: bold; border: 1px solid rgba(40, 167, 69, 0.3); text-align: center;">
+                        ✅ Order လက်ခံလိုက်ပါပြီ။ ပို့ဆောင်ရန်ပြင်ဆင်နေပါသည်၊ ၃ ရက်မှ ၄ ရက်အတွင်း ရောက်ပါမည်။
+                    </div>`;
+                } else {
+                    // Confirm မနှိပ်ရသေးရင် (pending ဖြစ်နေရင်)
+                    statusText = `<div style="background: rgba(255, 204, 0, 0.1); color: #ffcc00; padding: 8px; border-radius: 5px; margin-top: 8px; font-size: 12px; font-weight: bold; border: 1px solid rgba(255, 204, 0, 0.3); text-align: center;">
+                        ⏳ Order လက်ခံရန် စောင့်ဆိုင်းနေပါသည်...
+                    </div>`;
+                }
+
                 html += `
                     <div style="background: rgba(255,255,255,0.05); border: 1px solid #333; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 13px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
@@ -807,6 +821,7 @@
                         <div style="color: #fff; margin-bottom: 4px;">👤 အမည်: <strong style="color: #fff;">${order.customer_name || '-'}</strong></div>
                         <div style="color: #ccc; margin-bottom: 4px;">💰 စုစုပေါင်း: <strong style="color: #ffcc00;">${order.total_price || '0'}</strong></div>
                         <div style="color: #aaa; font-size: 12px; margin-top: 4px;">📍 လိပ်စာ: ${order.customer_address || '-'}</div>
+                        ${statusText}
                     </div>
                 `;
             });
@@ -817,6 +832,7 @@
             historyList.innerHTML = `<p style="color: #ff4d4d; text-align: center; margin: 20px 0;">⚠️ Error: ${error.message}</p>`;
         }
     }
+
 
     async function handleLogout() {
         try {
