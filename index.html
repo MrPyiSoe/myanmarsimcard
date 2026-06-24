@@ -693,7 +693,8 @@
     // 🛠️ ပြင်ဆင်ပြီးချက် (၁) - supabase နေရာတွင် supabaseClient သို့ ကွက်တိပြောင်းလဲခြင်း
     async function checkUserSession() {
         if (!supabaseClient) return;
-        const { data: { session } } = await supabaseClient.auth.getSession(); // 👈 ပြင်ဆင်ပြီး
+        // 🛠️ supabase နေရာမှာ supabaseClient လို့ပဲ ပြောင်းလိုက်ပါတယ် အစ်ကို
+        const { data: { session } } = await supabaseClient.auth.getSession(); 
         if (session) {
             currentUser = session.user;
             document.getElementById('memberBtnText').innerText = "👤 My Profile";
@@ -783,7 +784,7 @@
         if (!currentUser) return;
 
         try {
-            // RLS ဖွင့်ထားတာရော၊ ပိတ်ထားတာရော အားလုံးအတွက် လှမ်းဖတ်ရတာ သေချာစေရန်
+            // 🛠️ ဒီနေရာမှာလည်း supabaseClient လို့ ကွက်တိ ပြောင်းလဲထားပါတယ်ဗျာ
             const { data, error } = await supabaseClient 
                 .from('orders') 
                 .select('*')
@@ -791,13 +792,11 @@
                 
             if (error) throw error;
 
-            // အော်ဒါ လုံးဝမရှိသေးရင် ပေါ်မယ့်စာသား
             if (!data || data.length === 0) {
                 historyList.innerHTML = `<p style="color: #aaa; text-align: center; margin: 20px 0;">🛒 ဝယ်ယူမှုမှတ်တမ်း မရှိသေးပါဗျာ။</p>`;
                 return;
             }
 
-            // အော်ဒါရှိရင် လှလှပပ ပြသပေးမည့်အပိုင်း
             let html = '';
             data.forEach(order => {
                 html += `
@@ -807,7 +806,7 @@
                             <span style="color: #aaa;">${new Date(order.created_at).toLocaleDateString()}</span>
                         </div>
                         <div style="color: #fff; margin-bottom: 4px;">👤 အမည်: <strong style="color: #fff;">${order.customer_name || '-'}</strong></div>
-                        <div style="color: #ccc; margin-bottom: 4px;">💰 စုစုပေါင်းကျသင့်ငွေ: <strong style="color: #ffcc00;">${order.total_price || '0'}</strong> ကျပ်</div>
+                        <div style="color: #ccc; margin-bottom: 4px;">💰 စစုပေါင်းကျသင့်ငွေ: <strong style="color: #ffcc00;">${order.total_price || '0'}</strong> ကျပ်</div>
                         <div style="color: #aaa; font-size: 12px; margin-top: 4px;">📍 ပို့ဆောင်မည့်လိပ်စာ: ${order.customer_address || '-'}</div>
                     </div>
                 `;
@@ -819,7 +818,6 @@
             historyList.innerHTML = `<p style="color: #ff4d4d; text-align: center; margin: 20px 0;">⚠️ Error: ${error.message || 'ဒေတာဘေ့စ် ချိတ်ဆက်မှု အဆင်မပြေပါ'}</p>`;
         }
     }
-
     async function handleLogout() {
         try {
             const { error } = await supabaseClient.auth.signOut();
