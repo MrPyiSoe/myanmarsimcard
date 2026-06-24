@@ -831,6 +831,55 @@
             alert('အကောင့်ထွက်ရာတွင် အမှားအယွင်းရှိပါသည်: ' + error.message);
         }
     }
+        // 🌟 ပျောက်နေသော Login နှင့် Register လုပ်သည့် Function
+    async function handleAuth(type) {
+        const email = document.getElementById('memberEmail').value.trim();
+        const password = document.getElementById('memberPassword').value.trim();
+
+        if (!email || !password) {
+            alert("ကျေးဇူးပြု၍ အီးမေးလ်နှင့် လျှို့ဝှက်နံပါတ်ကို ပြည့်စုံစွာ ဖြည့်ပါ။");
+            return;
+        }
+
+        try {
+            let authResponse;
+            if (type === 'signup') {
+                // အကောင့်သစ်ဖွင့်ခြင်း
+                authResponse = await supabaseClient.auth.signUp({
+                    email: email,
+                    password: password,
+                });
+                if (authResponse.error) throw authResponse.error;
+                
+                alert("အကောင့်ဖွင့်ခြင်း အောင်မြင်ပါသည်။");
+                if (authResponse.data.session) {
+                    currentUser = authResponse.data.user;
+                    document.getElementById('memberBtnText').innerText = "👤 My Profile";
+                    showProfileDashboard();
+                }
+            } else {
+                // Login ဝင်ခြင်း
+                authResponse = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                });
+                if (authResponse.error) throw authResponse.error;
+                
+                currentUser = authResponse.data.user;
+                document.getElementById('memberBtnText').innerText = "👤 My Profile";
+                showProfileDashboard();
+                alert("Login ဝင်ခြင်း အောင်မြင်ပါသည်။");
+            }
+        } catch (error) {
+            console.error("Auth Error:", error);
+            if (error.message.includes("Invalid login credentials")) {
+                alert("အီးမေးလ် (သို့) လျှို့ဝှက်နံပါတ် မှားယွင်းနေပါသည်။");
+            } else {
+                alert("အမှားအယွင်းဖြစ်နေပါသည်: " + error.message);
+            }
+        }
+    }
+
 async function fetchOrderHistory() {
         const historyList = document.getElementById('historyList');
         if (!currentUser) return;
