@@ -1106,15 +1106,10 @@
         btn.disabled = true;
 
         const total = document.getElementById('cartTotal').innerText;
-        
-        // ကတ်ထဲက ဖုန်းနံပါတ်လှများကို စာသားအဖြစ် ပြောင်းလဲခြင်း
         const itemsText = cart.map(item => `${item.number} (${item.price})`).join(', ');
-
-        // လက်ရှိ Login ဝင်ထားတဲ့ User ရဲ့ Email နဲ့ ID ကို ရယူခြင်း
         const userEmail = currentUser ? currentUser.email : 'guest';
-        const userId = currentUser ? currentUser.id : null;
 
-        // ၁။ Supabase ထဲသို့ အော်ဒါ အမှန်ကန် လှမ်းသိမ်းခြင်း
+        // ၁။ Supabase ထဲသို့ သိမ်းဆည်းခြင်း ('user-id' ကို ကုဒ်ထဲက ဖယ်ထုတ်ထားပါတယ်)
         try {
             const { error: dbError } = await supabaseClient
                 .from('orders')
@@ -1124,9 +1119,8 @@
                         customer_phone: phone,
                         customer_address: address, 
                         total_price: total,
-                        cart_items: itemsText,   // 👈 အစ်ကို့ Table က နာမည် 'cart_items' အတိုင်း ပြင်လိုက်ပါပြီ
-                        user_email: userEmail,   // 👈 'user_email' ကော်လံအတိုင်း ပြင်လိုက်ပါပြီ
-                        "user-id": userId,       // 👈 'user-id' ကော်လံအတိုင်း ပြင်လိုက်ပါပြီ
+                        cart_items: itemsText,   
+                        user_email: userEmail,   
                         status: 'pending'
                     }
                 ]);
