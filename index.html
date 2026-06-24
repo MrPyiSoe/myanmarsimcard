@@ -1161,7 +1161,7 @@ async function fetchOrderHistory() {
         document.getElementById('checkoutModal').style.display = 'flex'; 
     }
 
-    async function confirmOrder() {
+        async function confirmOrder() {
         const name = document.getElementById('customerName').value.trim();
         const phone = document.getElementById('customerPhone').value.trim();
         const address = document.getElementById('customerAddress').value.trim();
@@ -1178,13 +1178,29 @@ async function fetchOrderHistory() {
         const total = document.getElementById('cartTotal').innerText;
 
         try {
+            // ၁။ Telegram သို့ ပို့ရန် (မူလအတိုင်း)
             const response = await fetch('/api/order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, phone, address, cart, total })
             });
 
-            const data = await response.json();
+            // ၂။ Supabase ဒေတာဘေ့စ်ထဲသို့ မှတ်တမ်းသိမ်းရန် (အသစ်ထပ်တိုးထားသည့်အပိုင်း)
+            const { error: dbError } = await supabaseClient
+                .from('orders')
+                .insert([
+                    { 
+                        customer_name: name, 
+                        customer_phone: phone,
+                        customer_address: address, 
+                        total_price: total,
+                        status: 'pending'
+                    }
+                ]);
+
+            if (dbError) {
+                console.error("Database Insert Error:", dbError);
+            }
 
             if (response.ok) {
                 alert("အော်ဒါတင်ခြင်း အောင်မြင်ပါသည်။ မကြာမီ ဆက်သွယ်ပေးပါမည်။");
@@ -1194,9 +1210,13 @@ async function fetchOrderHistory() {
                 document.getElementById('customerName').value = '';
                 document.getElementById('customerPhone').value = '';
                 document.getElementById('customerAddress').value = '';
+                
+                // 🌟 အော်ဒါတင်ပြီးတာနဲ့ မှတ်တမ်းထဲ ချက်ချင်းပေါ်လာအောင် Refresh လုပ်ပေးခြင်း
+                if (currentUser) {
+                    fetchOrderHistory();
+                }
             } else {
                 alert("အော်ဒါတင်ရာတွင် အမှားအယွင်းဖြစ်နေပါသည်။");
-                console.error(data.error);
             }
         } catch (error) {
             alert("အင်တာနက် ချက်ဆက်မှု စစ်ဆေးပေးပါ။");
@@ -1206,6 +1226,7 @@ async function fetchOrderHistory() {
             btn.disabled = false;
         }
     }
+
 
     window.onclick = function(event) {
         const numberModal = document.getElementById('numberModal');
