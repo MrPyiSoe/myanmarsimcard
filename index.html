@@ -494,7 +494,7 @@
         gap: 12px;
       }
     }
-  </style>
+  </style> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -503,6 +503,10 @@
     <div style="display: flex; align-items: center; background: rgba(0, 0, 0, 0.85); border: 1px solid #555; border-radius: 20px; padding: 6px 12px; backdrop-filter: blur(8px); max-width: 180px; flex-grow: 1; pointer-events: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
       <span style="font-size: 14px;">🔍</span>
       <input type="text" id="searchInput" placeholder="ရှာရန်..." style="background: transparent; border: none; color: #fff; outline: none; width: 100%; margin-left: 5px; font-size: 14px; font-family: 'Noto Sans Myanmar', sans-serif;">
+    </div>
+
+    <div onclick="openMemberModal()" style="cursor: pointer; pointer-events: auto; background: rgba(0, 0, 0, 0.85); padding: 6px 12px; border-radius: 20px; border: 1px solid #555; color: white; font-size: 13px; display: flex; align-items: center; justify-content: center; height: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); font-weight: bold; transition: 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+      <span id="memberBtnText">👤 Member</span>
     </div>
 
     <div class="cart-container" onclick="showCartModal()" style="position: relative; top: 0; right: 0; pointer-events: auto; flex-shrink: 0; background: rgba(0, 0, 0, 0.85); padding: 6px; border-radius: 50%; border: 1px solid #444; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
@@ -601,51 +605,93 @@
           <span class="total-text">စုစုပေါင်း:</span>
           <span class="total-price" id="cartTotal">0 Ks</span>
         </div>
-        <button class="checkout-btn" onclick="openCheckoutForm()">ဝယ်ယူမည် (Checkout)</button>
+<button class="checkout-btn" onclick="openCheckoutForm()">ဝယ်ယူမည် (Checkout)</button>
       </div>
     </div>
-  </div>
-
- <div id="checkoutModal" class="modal-overlay">
-  <div class="modal-content" style="display: flex; flex-direction: column; max-height: 85vh;">
-    
-    <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; width: 100%; box-sizing: border-box;">
-      <h2 class="modal-title" style="font-size: 20px; margin: 0;">အချက်အလက်ဖြည့်ပါ</h2>
-      <span class="close-btn" onclick="closeModal('checkoutModal')">&times;</span>
-    </div>
-    
-    <div class="modal-body" style="padding: 20px; overflow-y: auto;">
+  </div> <div id="checkoutModal" class="modal-overlay">
+    <div class="modal-content" style="display: flex; flex-direction: column; max-height: 85vh;">
+      <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; width: 100%; box-sizing: border-box;">
+        <h2 class="modal-title" style="font-size: 20px; margin: 0;">အချက်အလက်ဖြည့်ပါ</h2>
+        <span class="close-btn" onclick="closeModal('checkoutModal')">&times;</span>
+      </div>
       
-      <div style="background: rgba(0, 150, 255, 0.1); border: 1px solid #0096ff; padding: 10px; border-radius: 8px; color: #e0e0e0; font-size: 13px; margin-bottom: 15px; text-align: center; line-height: 1.5;">
-        📌 Royal Express ရောက်သည့်မြို့တိုင်းကို ပို့ဆောင်ခ (၅၀၀၀)ကျပ်ဖြင့် အိမ်ရောက်ငွေချေ ပို့ဆောင်ပေးပါသည်။
-      </div>
+      <div class="modal-body" style="padding: 20px; overflow-y: auto;">
+        <div style="background: rgba(0, 150, 255, 0.1); border: 1px solid #0096ff; padding: 10px; border-radius: 8px; color: #e0e0e0; font-size: 13px; margin-bottom: 15px; text-align: center; line-height: 1.5;">
+          📌 Royal Express ရောက်သည့်မြို့တိုင်းကို ပို့ဆောင်ခ (၅००ဝ)ကျပ်ဖြင့် အိမ်ရောက်ငွေချေ ပို့ဆောင်ပေးပါသည်။
+        </div>
 
-      <div class="form-group">
-        <label class="form-label">အမည်</label>
+        <div class="form-group">
+          <label class="form-label">အမည်</label>
           <input type="text" id="customerName" class="form-input" placeholder="လူကြီးမင်း၏ အမည်">
         </div>
-        
+          
         <div class="form-group">
           <label class="form-label">ဆက်သွယ်ရန် ဖုန်းနံပါတ်</label>
           <input type="tel" id="customerPhone" class="form-input" placeholder="09xxxxxxxxx">
         </div>
-        
+          
         <div class="form-group">
           <label class="form-label">ပို့ဆောင်ပေးရမည့် လိပ်စာ</label>
           <textarea id="customerAddress" class="form-input" rows="3" placeholder="မြို့၊ မြို့နယ်၊ လမ်း၊ အိမ်အမှတ်"></textarea>
         </div>
-        
+          
         <button id="submitOrderBtn" class="checkout-btn" onclick="confirmOrder()">အော်ဒါတင်မည်</button>
       </div>
+    </div>
+  </div> <div id="memberModal" class="modal-overlay">
+    <div class="modal-content" style="max-height: 85vh;">
+      <div class="modal-header">
+        <h2 class="modal-title" id="memberModalTitle">အဖွဲ့ဝင်ဝင်ရန် (Member)</h2>
+        <span class="close-btn" onclick="closeModal('memberModal')">&times;</span>
+      </div>
+      <div class="modal-body" style="overflow-y: auto;">
+        
+        <div id="authSection">
+          <div class="form-group">
+            <label class="form-label">အီးမေးလ် (Email)</label>
+            <input type="email" id="memberEmail" class="form-input" placeholder="example@email.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">လျှို့ဝှက်နံပါတ် (Password)</label>
+            <input type="password" id="memberPassword" class="form-input" placeholder="အနည်းဆုံး ၆ လုံး">
+          </div>
+          <button onclick="handleAuth('login')" class="checkout-btn" style="background: linear-gradient(45deg, #0096ff, #005bb5);">ဝင်မည် (Login)</button>
+          <button onclick="handleAuth('signup')" class="checkout-btn" style="background: #222; border: 1px solid #444; margin-top: 10px;">အကောင့်အသစ်ဖွင့်မည် (Register)</button>
+        </div>
 
+        <div id="profileSection" style="display: none;">
+          <p style="color: #0096ff; font-weight: bold; margin-top: 0;">မင်္ဂလာပါ: <span id="userDisplayEmail" style="color:#fff;"></span></p>
+          <hr style="border-color: #333; margin: 15px 0;">
+          <h3 style="color: white; font-size: 16px; margin-bottom: 12px;">📦 လူကြီးမင်း၏ ဝယ်ယူမှုမှတ်တမ်း</h3>
+          <div id="historyList">အော်ဒါမှတ်တမ်းများကို ဆွဲယူနေပါသည်...</div>
+          <button onclick="handleLogout()" class="checkout-btn remove-btn" style="margin-top: 20px;">အကောင့်မှထွက်မည် (Logout)</button>
+        </div>
+
+      </div>
     </div>
   </div>
 
   <script>
-    let cart = []; 
+    let cart = [];
     
     let allNumbersData = []; 
+// 🌟 ၎င်းစာကြောင်းရဲ့ အောက်တည့်တည့်မှာ ဒီကုဒ်ကို ကူးပြီး ထည့်ပေးပါ အစ်ကို
+    const SUPABASE_URL = "https://kwkbrfxaaoovdxvzppqy.supabase.co"; // အစ်ကို့ Supabase URL ထည့်ရန်
+    const SUPABASE_ANON_KEY = "sb_publishable_XQ56SyFAXMywsrnHHT2r7A_ddrMRjMv";      // အစ်ကို့ Supabase Anon Key ထည့်ရန်
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    let currentUser = null; // လက်ရှိ Login ဝင်ထားတဲ့ User ကို မှတ်သားရန် ဗေရီယေဘယ်လ်
+    async function checkUserSession() {
+        if (!supabase) return;
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+            currentUser = session.user;
+            document.getElementById('memberBtnText').innerText = "👤 My Profile";
+        } else {
+            currentUser = null;
+            document.getElementById('memberBtnText').innerText = "👤 Member";
+        }
+    }
     async function preloadAllNumbers() {
         const operators = [
             { file: 'mpt.json', name: 'MPT' },
@@ -692,11 +738,123 @@
         }
     }
 
-    window.addEventListener('DOMContentLoaded', preloadAllNumbers);
+    window.addEventListener('DOMContentLoaded', () => {
+        checkUserSession();   // အကောင့်ဝင်/မဝင် စစ်ဆေးခိုင်းခြင်း
+        preloadAllNumbers();  // ဖုန်းနံပါတ်ဒေတာတွေ ကြိုတင်ဆွဲခိုင်းခြင်း
+    });
 
+// 🌟 ဤနေရာတွင် အောက်က ဖန်ရှင်အသစ်တွေကို ကူးပြီး ညှပ်ထည့်ပေးပါ အစ်ကို
+    function openMemberModal() {
+        document.getElementById('memberModal').style.display = 'flex';
+        // အကယ်၍ အကောင့်ဝင်ထားပြီးသားဆိုရင် ဝယ်ယူမှုမှတ်တမ်းကို တန်းပြပေးရန်
+        if (currentUser) {
+            showProfileDashboard();
+        } else {
+            showAuthForm();
+        }
+    }
 
-    let currentActiveOperator = "ALL"; 
+    function showAuthForm() {
+        document.getElementById('memberModalTitle').innerText = "အဖွဲ့ဝင်ဝင်ရန် (Member)";
+        document.getElementById('authSection').style.display = 'block';
+        document.getElementById('profileSection').style.display = 'none';
+    }
 
+    // 🌟 အပေါ်က ဖန်ရှင်အပိတ်ပြီးတာနဲ့ ဒီအတိုင်း စီတန်းပြီး လာရပါမယ်ဗျာ
+    function showProfileDashboard() {
+        document.getElementById('memberModalTitle').innerText = "လူကြီးမင်း၏ Profile";
+        document.getElementById('authSection').style.display = 'none';
+        document.getElementById('profileSection').style.display = 'block';
+        document.getElementById('userDisplayEmail').innerText = currentUser.email;
+        fetchOrderHistory(); 
+    }
+
+    async function handleAuth(type) {
+        const email = document.getElementById('memberEmail').value.trim();
+        const password = document.getElementById('memberPassword').value;
+
+        if (!email || !password) {
+            alert('အီးမေးလ် နှင့် လျှို့ဝှက်နံပါတ်ကို ပြည့်စုံစွာ ဖြည့်ပေးပါဗျာ။');
+            return;
+        }
+
+        try {
+            if (type === 'signup') {
+                const { data, error } = await supabase.auth.signUp({ email, password });
+                if (error) throw error;
+                alert('အကောင့်ဖွင့်ခြင်း အောင်မြင်ပါသည်။ အီးမေးလ်ထဲသို့ Verification Link ပို့ထားပါက Confirm လုပ်ပေးပါဗျာ။');
+            } else {
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                currentUser = data.user;
+                document.getElementById('memberBtnText').innerText = "👤 My Profile";
+                showProfileDashboard();
+                alert('Login ဝင်ရောက်ခြင်း အောင်မြင်ပါသည်ဗျာ။');
+            }
+        } catch (error) {
+            console.error('Auth Error:', error);
+            alert('အမှားအယွင်းရှိပါသည်: ' + error.message);
+        }
+    }
+
+    async function handleLogout() {
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+            currentUser = null;
+            document.getElementById('memberBtnText').innerText = "👤 Member";
+            showAuthForm();
+            alert('အကောင့်ထဲမှ ထွက်ပြီးပါပြီဗျာ။');
+        } catch (error) {
+            console.error('Logout Error:', error);
+            alert('အကောင့်ထွက်ရာတွင် အမှားအယွင်းရှိပါသည်: ' + error.message);
+        }
+    }
+async function fetchOrderHistory() {
+        const historyList = document.getElementById('historyList');
+        if (!currentUser) return;
+
+        try {
+            // Supabase ရှိ 'orders' table ထဲကနေ လက်ရှိ user ရဲ့ email နဲ့ ကိုက်ညီတဲ့ data တွေကို ဆွဲယူခြင်း
+            // Note: အစ်ကို့ database ထဲက table နာမည် သို့မဟုတ် ကော်လံနာမည် ကွဲပြားရင် ဒါလေး ပြန်ပြင်ရပါမယ်
+            const { data, error } = await supabase
+                .from('orders') 
+                .select('*')
+                .eq('user_email', currentUser.email) // user ရဲ့ အော်ဒါတွေကို စစ်ထုတ်ခြင်း
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            if (!data || data.length === 0) {
+                historyList.innerHTML = `<p style="color: #aaa; text-align: center; margin: 20px 0;">ဝယ်ယူမှုမှတ်တမ်း မရှိသေးပါဗျာ။</p>`;
+                return;
+            }
+
+            // မှတ်တမ်းရှိပါက HTML ပုံစံဖြင့် ထုတ်ပြခြင်း
+            let html = '';
+            data.forEach(order => {
+                html += `
+                    <div style="background: rgba(255,255,255,0.05); border: 1px solid #333; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 13px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #0096ff; font-weight: bold;">🆔 Order #:${order.id}</span>
+                            <span style="color: #aaa;">${new Date(order.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <div style="color: #fff; margin-bottom: 4px;">📞 ဝယ်ယူသည့်နံပါတ်: <strong style="color: #ffcc00;">${order.purchased_numbers || order.number || 'မရှိပါ'}</strong></div>
+                        <div style="color: #ccc;">💰 စုစုပေါင်းကျသင့်ငွေ: ${order.total_price || order.price || '0'} ကျပ်</div>
+                        <div style="color: #aaa; font-size: 12px; margin-top: 4px;">📍 ပို့ဆောင်မည့်လိပ်စာ: ${order.address || order.customer_address || '-'}</div>
+                    </div>
+                `;
+            });
+            historyList.innerHTML = html;
+
+        } catch (error) {
+            console.error('Fetch History Error:', error);
+            historyList.innerHTML = `<p style="color: #ff4d4d; text-align: center; margin: 20px 0;">မှတ်တမ်းဆွဲယူရာတွင် အမှားအယွင်းရှိပါသည်</p>`;
+        }
+    }
+
+    let currentActiveOperator = "ALL"; // အစ်ကို့ဆီက ရှိပြီးသား စာကြောင်း ဖြစ်ပါတယ်
+  
     // 🌟 ပြင်ဆင်ပြီးချက် - ပုံနှိပ်လိုက်တာနဲ့ အရေအတွက်ကိုပါ တွက်ချက်ပြသပေးမည့် စနစ်
     function showNumbers(jsonFile, operatorName, event) {
         if(event) event.preventDefault(); 
@@ -782,8 +940,8 @@
                 operatorCount.innerText = ` (စုစုပေါင်း ${allNumbersData.length} လုံး)`;
                 renderNumbers(allNumbersData);
             }
-            document.getElementById('searchInput').value = "";
-            document.getElementById('modalSearchInput').value = "";
+            document.getElementById('').value = "";
+            document.getElementById('modal').value = "";
             return;
         }
 
