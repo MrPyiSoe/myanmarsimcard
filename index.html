@@ -777,28 +777,40 @@
     // 🛠️ ပြင်ဆင်ပြီးချက် - ဖန်ရှင်ထပ်နေတာကို ရှင်းလင်းပြီး ဒေတာအားလုံးဆွဲချရန် စနစ်တစ်ခုတည်း ထားရှိခြင်း
     async function fetchOrderHistory() {
         const historyList = document.getElementById('historyList');
-        if (!currentUser) return;
+        
+        // ၁။ အကယ်၍ Login မဝင်ထားရင် မှတ်တမ်း မပြပါဘူး
+        if (!currentUser || !currentUser.email) {
+            historyList.innerHTML = `<p style="color: #aaa; text-align: center; margin: 20px 0;">🛒 အော်ဒါမှတ်တမ်းကြည့်ရန် အကောင့်ဝင်ပေးပါဗျာ။</p>`;
+            return;
+        }
 
         try {
-            // အစ်ကို့ orders table ထဲက ဒေတာအားလုံးကို ဆွဲချခြင်း
+            // ၂။ Supabase ထဲကနေ လက်ရှိ User ရဲ့ Email နဲ့ တူတာကိုပဲ စစ်ထုတ် (Filter) ဆွဲချခြင်း
             const { data, error } = await supabaseClient 
                 .from('orders') 
                 .select('*')
+                .eq('user_email', currentUser.email) // 👈 ဒီစာကြောင်းက လက်ရှိအီးမေးလ်နဲ့ပဲ စစ်ထုတ်ပေးမှာပါ
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
 
+            // ၃။ အော်ဒါမှတ်တမ်း မရှိလျှင်
             if (!data || data.length === 0) {
                 historyList.innerHTML = `<p style="color: #aaa; text-align: center; margin: 20px 0;">🛒 ဝယ်ယူမှုမှတ်တမ်း မရှိသေးပါဗျာ။</p>`;
                 return;
             }
 
+            // ၄။ အော်ဒါမှတ်တမ်းများ ရှိလျှင် HTML ပြသခြင်း
             let html = '';
             data.forEach(order => {
                 let statusText = '';
                 if (order.status === 'confirmed') {
                     statusText = `<div style="background: rgba(40, 167, 69, 0.1); color: #28a745; padding: 8px; border-radius: 5px; margin-top: 8px; font-size: 12px; font-weight: bold; border: 1px solid rgba(40, 167, 69, 0.3); text-align: center;">
                         ✅ Order လက်ခံလိုက်ပါပြီ။ ပို့ဆောင်ရန်ပြင်ဆင်နေပါသည်၊ ၃ ရက်မှ ၄ ရက်အတွင်း ရောက်ပါမည်။
+                    </div>`;
+                } else if (order.status === 'cancelled') {
+                    statusText = `<div style="background: rgba(220, 53, 69, 0.1); color: #dc3545; padding: 8px; border-radius: 5px; margin-top: 8px; font-size: 12px; font-weight: bold; border: 1px solid rgba(220, 53, 69, 0.3); text-align: center;">
+                        ❌ ဤအော်ဒါကို ပယ်ဖျက်လိုက်ပါပြီ။
                     </div>`;
                 } else {
                     statusText = `<div style="background: rgba(255, 204, 0, 0.1); color: #ffcc00; padding: 8px; border-radius: 5px; margin-top: 8px; font-size: 12px; font-weight: bold; border: 1px solid rgba(255, 204, 0, 0.3); text-align: center;">
