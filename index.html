@@ -822,12 +822,10 @@ async function fetchOrderHistory() {
         if (!currentUser) return;
 
         try {
-            // Supabase ရှိ 'orders' table ထဲကနေ လက်ရှိ user ရဲ့ email နဲ့ ကိုက်ညီတဲ့ data တွေကို ဆွဲယူခြင်း
-            // Note: အစ်ကို့ database ထဲက table နာမည် သို့မဟုတ် ကော်လံနာမည် ကွဲပြားရင် ဒါလေး ပြန်ပြင်ရပါမယ်
-            const { data, error } = await supabaseClient
+            const { data, error } = await supabaseClient 
                 .from('orders') 
                 .select('*')
-                .eq('user_email', currentUser.email) // user ရဲ့ အော်ဒါတွေကို စစ်ထုတ်ခြင်း
+                .eq('user_email', currentUser.email) // 👈 အဆင့်(၁)မှာ ဆောက်လိုက်တဲ့ ကော်လံနဲ့ စစ်ထုတ်ပါမယ်
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
@@ -837,7 +835,6 @@ async function fetchOrderHistory() {
                 return;
             }
 
-            // မှတ်တမ်းရှိပါက HTML ပုံစံဖြင့် ထုတ်ပြခြင်း
             let html = '';
             data.forEach(order => {
                 html += `
@@ -846,9 +843,9 @@ async function fetchOrderHistory() {
                             <span style="color: #0096ff; font-weight: bold;">🆔 Order #:${order.id}</span>
                             <span style="color: #aaa;">${new Date(order.created_at).toLocaleDateString()}</span>
                         </div>
-                        <div style="color: #fff; margin-bottom: 4px;">📞 ဝယ်ယူသည့်နံပါတ်: <strong style="color: #ffcc00;">${order.purchased_numbers || order.number || 'မရှိပါ'}</strong></div>
-                        <div style="color: #ccc;">💰 စုစုပေါင်းကျသင့်ငွေ: ${order.total_price || order.price || '0'} ကျပ်</div>
-                        <div style="color: #aaa; font-size: 12px; margin-top: 4px;">📍 ပို့ဆောင်မည့်လိပ်စာ: ${order.address || order.customer_address || '-'}</div>
+                        <div style="color: #fff; margin-bottom: 4px;">👤 အမည်: <strong style="color: #fff;">${order.customer_name || '-'}</strong></div>
+                        <div style="color: #ccc; margin-bottom: 4px;">💰 စုစုပေါင်းကျသင့်ငွေ: <strong style="color: #ffcc00;">${order.total_price || '0'}</strong> ကျပ်</div>
+                        <div style="color: #aaa; font-size: 12px; margin-top: 4px;">📍 ပို့ဆောင်မည့်လိပ်စာ: ${order.customer_address || '-'}</div>
                     </div>
                 `;
             });
