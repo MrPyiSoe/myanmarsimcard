@@ -780,7 +780,7 @@
         if (!currentUser) return;
 
         try {
-            // အစ်ကို့ Table ထဲမှာ ရှိသမျှ အော်ဒါအားလုံးကို အရင်ဆွဲချပြီး ဗျူးပေးပါမယ်
+            // အစ်ကို့ orders table ထဲက ဒေတာအားလုံးကို ဆွဲချခြင်း
             const { data, error } = await supabaseClient 
                 .from('orders') 
                 .select('*')
@@ -806,14 +806,6 @@
                     </div>`;
                 }
 
-                // ကတ် (Cart) ထဲက ဖုန်းနံပါတ်လှများကို စာသားအဖြစ် ပြောင်းလဲထုတ်ပြခြင်း
-                let itemsText = '';
-                if (order.cart && Array.isArray(order.cart)) {
-                    itemsText = order.cart.map(item => `${item.number} (${item.price})`).join(', ');
-                } else if (typeof order.cart === 'string') {
-                    itemsText = order.cart;
-                }
-
                 html += `
                     <div style="background: rgba(255,255,255,0.05); border: 1px solid #333; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 13px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
@@ -821,7 +813,7 @@
                             <span style="color: #aaa;">${order.created_at ? new Date(order.created_at).toLocaleDateString() : '-'}</span>
                         </div>
                         <div style="color: #fff; margin-bottom: 4px;">👤 အမည်: <strong style="color: #fff;">${order.customer_name || '-'}</strong></div>
-                        <div style="color: #fff; margin-bottom: 4px;">📱 ဝယ်ယူသည့်နံပါတ်: <span style="color: #28a745; font-weight: bold;">${itemsText || '-'}</span></div>
+                        <div style="color: #fff; margin-bottom: 4px;">📱 ဝယ်ယူသည့်နံပါတ်: <span style="color: #28a745; font-weight: bold;">${order.cart_items || '-'}</span></div>
                         <div style="color: #ccc; margin-bottom: 4px;">💰 စုစုပေါင်းကျသင့်ငွေ: <strong style="color: #ffcc00;">${order.total_price || '0'}</strong></div>
                         <div style="color: #aaa; font-size: 12px; margin-top: 4px;">📍 ပို့ဆောင်မည့်လိပ်စာ: ${order.customer_address || '-'}</div>
                         ${statusText}
@@ -1114,18 +1106,16 @@
         btn.disabled = true;
 
         const total = document.getElementById('cartTotal').innerText;
-        // လက်ရှိ Login ဝင်ထားတဲ့ User Email ကို ယူခြင်း (မဝင်ထားရင် guest လို့ သတ်မှတ်ပါမယ်)
+        
+        // ကတ်ထဲက ဖုန်းနံပါတ်လှများကို စာသားအဖြစ် ပြောင်းလဲခြင်း
+        const itemsText = cart.map(item => `${item.number} (${item.price})`).join(', ');
+
+        // လက်ရှိ Login ဝင်ထားတဲ့ User ရဲ့ Email နဲ့ ID ကို ရယူခြင်း
         const userEmail = currentUser ? currentUser.email : 'guest';
+        const userId = currentUser ? currentUser.id : null;
 
+        // ၁။ Supabase ထဲသို့ အော်ဒါ အမှန်ကန် လှမ်းသိမ်းခြင်း
         try {
-            // ၁။ Telegram API သို့ ပို့ခြင်း
-            const response = await fetch('/api/order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, phone, address, cart, total })
-            });
-
-            // ၂။ Supabase ဒေတာဘေ့စ်ထဲသို့ အီးမေးလ်နှင့် Cart ပါ တစ်ခါတည်း သိမ်းဆည်းခြင်း
             const { error: dbError } = await supabaseClient
                 .from('orders')
                 .insert([
@@ -1134,15 +1124,28 @@
                         customer_phone: phone,
                         customer_address: address, 
                         total_price: total,
-                        cart: cart, // 👈 ရွေးချယ်ထားသော ဖုန်းနံပါတ်စာရင်းများပါ သိမ်းရန်
-                        user_email: userEmail, // 👈 ဒီကောင်လေး ပါမှ နောက်ပိုင်း အီးမေးလ်အလိုက် ပြန်စစ်ထုတ်ရလွယ်ပါမယ်
+                        cart_items: itemsText,   // 👈 အစ်ကို့ Table က နာမည် 'cart_items' အတိုင်း ပြင်လိုက်ပါပြီ
+                        user_email: userEmail,   // 👈 'user_email' ကော်လံအတိုင်း ပြင်လိုက်ပါပြီ
+                        "user-id": userId,       // 👈 'user-id' ကော်လံအတိုင်း ပြင်လိုက်ပါပြီ
                         status: 'pending'
                     }
                 ]);
 
             if (dbError) {
-                console.error("Database Insert Error:", dbError);
+                console.error("Supabase Error:", dbError);
+                alert("Database တွင် သိမ်းမရပါ: " + dbError.message);
             }
+        } catch (dbEx) {
+            console.error("Supabase Exception:", dbEx);
+        }
+
+        // ၂။ Telegram Bot ဆီ ပို့ခြင်း
+        try {
+            const response = await fetch('/api/order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, phone, address, cart, total })
+            });
 
             if (response.ok) {
                 alert("အော်ဒါတင်ခြင်း အောင်မြင်ပါသည်။ မကြာမီ ဆက်သွယ်ပေးပါမည်။");
@@ -1154,13 +1157,13 @@
                 document.getElementById('customerAddress').value = '';
                 
                 if (currentUser) {
-                    fetchOrderHistory();
+                    fetchOrderHistory(); 
                 }
             } else {
-                alert("အော်ဒါတင်ရာတွင် အမှားအယွင်းဖြစ်နေပါသည်။");
+                alert("အော်ဒါပေးပို့ရန် အဆင်မပြေဖြစ်ခဲ့ပါသည်။");
             }
         } catch (error) {
-            alert("အင်တာနက် ချိတ်ဆက်မှု စစ်ဆေးပေးပါ။");
+            alert("အော်ဒါတင်စဉ် အမှားအယွင်းရှိခဲ့ပါသည်။");
             console.error(error);
         } finally {
             btn.innerText = 'အော်ဒါတင်မည်';
