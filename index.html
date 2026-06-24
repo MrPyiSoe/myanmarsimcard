@@ -825,8 +825,7 @@ async function fetchOrderHistory() {
             const { data, error } = await supabaseClient 
                 .from('orders') 
                 .select('*')
-                .eq('user_email', currentUser.email) // 👈 အဆင့်(၁)မှာ ဆောက်လိုက်တဲ့ ကော်လံနဲ့ စစ်ထုတ်ပါမယ်
-                .order('created_at', { ascending: false });
+                .order('created_at', { ascending: false }); // 👈 အားလုံးကို အရင်ဆွဲတင်ခိုင်းကြည့်တာပါ
 
             if (error) throw error;
 
