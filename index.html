@@ -680,20 +680,16 @@
 
   <script>
     let cart = [];
-    
     let allNumbersData = []; 
-// 🌟 ၎င်းစာကြောင်းရဲ့ အောက်တည့်တည့်မှာ ဒီကုဒ်ကို ကူးပြီး ထည့်ပေးပါ အစ်ကို
+    
     const SUPABASE_URL = "https://kwkbrfxaaouvdxvzppqy.supabase.co"; 
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3a2JyZnhhYW91dmR4dnpwcHF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNTk3NjAsImV4cCI6MjA5NzgzNTc2MH0.OBCEJoFpo8hM5_veBRxY9QASoFOKTwOPfbTV9ChE5yo";      
     
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let currentUser = null; 
 
-    let currentUser = null; // လက်ရှိ Login ဝင်ထားတဲ့ User ကို မှတ်သားရန် ဗေရီယေဘယ်လ်
-
-    // 🛠️ ပြင်ဆင်ပြီးချက် (၁) - supabase နေရာတွင် supabaseClient သို့ ကွက်တိပြောင်းလဲခြင်း
     async function checkUserSession() {
         if (!supabaseClient) return;
-        // 🛠️ supabase နေရာမှာ supabaseClient လို့ပဲ ပြောင်းလိုက်ပါတယ် အစ်ကို
         const { data: { session } } = await supabaseClient.auth.getSession(); 
         if (session) {
             currentUser = session.user;
@@ -703,6 +699,7 @@
             document.getElementById('memberBtnText').innerText = "👤 Member";
         }
     }
+
     async function preloadAllNumbers() {
         const operators = [
             { file: 'mpt.json', name: 'MPT' },
@@ -750,11 +747,10 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-        checkUserSession();   // အကောင့်ဝင်/မဝင် စစ်ဆေးခိုင်းခြင်း
-        preloadAllNumbers();  // ဖုန်းနံပါတ်ဒေတာတွေ ကြိုတင်ဆွဲခိုင်းခြင်း
+        checkUserSession();   
+        preloadAllNumbers();  
     });
 
-// 🌟 ဤနေရာတွင် အောက်က ဖန်ရှင်အသစ်တွေကို ကူးပြီး ညှပ်ထည့်ပေးပါ အစ်ကို
     function openMemberModal() {
         document.getElementById('memberModal').style.display = 'flex';
         if (currentUser) {
@@ -778,11 +774,13 @@
         fetchOrderHistory(); 
     }
 
-            async function fetchOrderHistory() {
+    // 🛠️ ပြင်ဆင်ပြီးချက် - ဖန်ရှင်ထပ်နေတာကို ရှင်းလင်းပြီး ဒေတာအားလုံးဆွဲချရန် စနစ်တစ်ခုတည်း ထားရှိခြင်း
+    async function fetchOrderHistory() {
         const historyList = document.getElementById('historyList');
         if (!currentUser) return;
 
         try {
+            // အစ်ကို့ Table ထဲမှာ ရှိသမျှ အော်ဒါအားလုံးကို အရင်ဆွဲချပြီး ဗျူးပေးပါမယ်
             const { data, error } = await supabaseClient 
                 .from('orders') 
                 .select('*')
@@ -797,30 +795,35 @@
 
             let html = '';
             data.forEach(order => {
-                
-                // 🌟 Status ပေါ်မူတည်ပြီး စာသားပြောင်းလဲပေးမည့် အပိုင်း
                 let statusText = '';
-                // ဒေတာဘေ့စ်ထဲက status က 'confirmed' ဖြစ်နေရင် (သို့) Telegram က Confirm နှိပ်ပြီးရင်
                 if (order.status === 'confirmed') {
                     statusText = `<div style="background: rgba(40, 167, 69, 0.1); color: #28a745; padding: 8px; border-radius: 5px; margin-top: 8px; font-size: 12px; font-weight: bold; border: 1px solid rgba(40, 167, 69, 0.3); text-align: center;">
                         ✅ Order လက်ခံလိုက်ပါပြီ။ ပို့ဆောင်ရန်ပြင်ဆင်နေပါသည်၊ ၃ ရက်မှ ၄ ရက်အတွင်း ရောက်ပါမည်။
                     </div>`;
                 } else {
-                    // Confirm မနှိပ်ရသေးရင် (pending ဖြစ်နေရင်)
                     statusText = `<div style="background: rgba(255, 204, 0, 0.1); color: #ffcc00; padding: 8px; border-radius: 5px; margin-top: 8px; font-size: 12px; font-weight: bold; border: 1px solid rgba(255, 204, 0, 0.3); text-align: center;">
                         ⏳ Order လက်ခံရန် စောင့်ဆိုင်းနေပါသည်...
                     </div>`;
+                }
+
+                // ကတ် (Cart) ထဲက ဖုန်းနံပါတ်လှများကို စာသားအဖြစ် ပြောင်းလဲထုတ်ပြခြင်း
+                let itemsText = '';
+                if (order.cart && Array.isArray(order.cart)) {
+                    itemsText = order.cart.map(item => `${item.number} (${item.price})`).join(', ');
+                } else if (typeof order.cart === 'string') {
+                    itemsText = order.cart;
                 }
 
                 html += `
                     <div style="background: rgba(255,255,255,0.05); border: 1px solid #333; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 13px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                             <span style="color: #0096ff; font-weight: bold;">🆔 Order #:${order.id || '-'}</span>
-                            <span style="color: #aaa;">${new Date(order.created_at).toLocaleDateString()}</span>
+                            <span style="color: #aaa;">${order.created_at ? new Date(order.created_at).toLocaleDateString() : '-'}</span>
                         </div>
                         <div style="color: #fff; margin-bottom: 4px;">👤 အမည်: <strong style="color: #fff;">${order.customer_name || '-'}</strong></div>
-                        <div style="color: #ccc; margin-bottom: 4px;">💰 စုစုပေါင်း: <strong style="color: #ffcc00;">${order.total_price || '0'}</strong></div>
-                        <div style="color: #aaa; font-size: 12px; margin-top: 4px;">📍 လိပ်စာ: ${order.customer_address || '-'}</div>
+                        <div style="color: #fff; margin-bottom: 4px;">📱 ဝယ်ယူသည့်နံပါတ်: <span style="color: #28a745; font-weight: bold;">${itemsText || '-'}</span></div>
+                        <div style="color: #ccc; margin-bottom: 4px;">💰 စုစုပေါင်းကျသင့်ငွေ: <strong style="color: #ffcc00;">${order.total_price || '0'}</strong></div>
+                        <div style="color: #aaa; font-size: 12px; margin-top: 4px;">📍 ပို့ဆောင်မည့်လိပ်စာ: ${order.customer_address || '-'}</div>
                         ${statusText}
                     </div>
                 `;
@@ -829,10 +832,9 @@
 
         } catch (error) {
             console.error('Fetch History Error:', error);
-            historyList.innerHTML = `<p style="color: #ff4d4d; text-align: center; margin: 20px 0;">⚠️ Error: ${error.message}</p>`;
+            historyList.innerHTML = `<p style="color: #ff4d4d; text-align: center; margin: 20px 0;">⚠️ Error: ${error.message || 'ဒေတာဘေ့စ် ချိတ်ဆက်မှု အဆင်မပြေပါ'}</p>`;
         }
     }
-
 
     async function handleLogout() {
         try {
@@ -847,7 +849,7 @@
             alert('အကောင့်ထွက်ရာတွင် အမှားအယွင်းရှိပါသည်: ' + error.message);
         }
     }
-        // 🌟 ပျောက်နေသော Login နှင့် Register လုပ်သည့် Function
+
     async function handleAuth(type) {
         const email = document.getElementById('memberEmail').value.trim();
         const password = document.getElementById('memberPassword').value.trim();
@@ -860,7 +862,6 @@
         try {
             let authResponse;
             if (type === 'signup') {
-                // အကောင့်သစ်ဖွင့်ခြင်း
                 authResponse = await supabaseClient.auth.signUp({
                     email: email,
                     password: password,
@@ -874,7 +875,6 @@
                     showProfileDashboard();
                 }
             } else {
-                // Login ဝင်ခြင်း
                 authResponse = await supabaseClient.auth.signInWithPassword({
                     email: email,
                     password: password,
@@ -896,64 +896,8 @@
         }
     }
 
-async function fetchOrderHistory() {
-        const historyList = document.getElementById('historyList');
-        if (!currentUser) return;
+    let currentActiveOperator = "ALL";
 
-        try {
-            // 🌟 user_email တွေ သုံးပြီး စစ်တာကို လုံးဝ ဖယ်ထုတ်လိုက်ပါပြီ
-            // 🌟 အစ်ကို့ Table ထဲက customer_name နဲ့ တိုက်ရိုက် ချိတ်ဆက်ပြီး ဆွဲထုတ်ပါမယ်
-            const { data, error } = await supabaseClient 
-                .from('orders') 
-                .select('*')
-                .eq('customer_name', currentUser.email); // 👈 ယာယီအားဖြင့် အလုပ်လုပ်၊ မလုပ် အရင်စမ်းသပ်ရန်
-
-            if (error) {
-                // တကယ်လို့ customer_name နဲ့ စစ်လို့ Error တက်ရင် အောက်ကအတိုင်း Table တစ်ခုလုံးကို ဆွဲချခိုင်းပါမယ်
-                const { data: allData, error: allError } = await supabaseClient
-                    .from('orders')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-                
-                if (allError) throw allError;
-                var finalData = allData;
-            } else {
-                var finalData = data;
-            }
-
-            // အော်ဒါ လုံးဝမရှိသေးရင် ပေါ်မယ့်စာသား
-            if (!finalData || finalData.length === 0) {
-                historyList.innerHTML = `<p style="color: #aaa; text-align: center; margin: 20px 0;">🛒 ဝယ်ယူမှုမှတ်တမ်း မရှိသေးပါဗျာ။</p>`;
-                return;
-            }
-
-            // အော်ဒါရှိရင် လှလှပပ ပြသပေးမည့်အပိုင်း
-            let html = '';
-            finalData.forEach(order => {
-                html += `
-                    <div style="background: rgba(255,255,255,0.05); border: 1px solid #333; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 13px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                            <span style="color: #0096ff; font-weight: bold;">🆔 Order #:${order.id}</span>
-                            <span style="color: #aaa;">${new Date(order.created_at).toLocaleDateString()}</span>
-                        </div>
-                        <div style="color: #fff; margin-bottom: 4px;">👤 အမည်: <strong style="color: #fff;">${order.customer_name || '-'}</strong></div>
-                        <div style="color: #ccc; margin-bottom: 4px;">💰 စုစုပေါင်းကျသင့်ငွေ: <strong style="color: #ffcc00;">${order.total_price || '0'}</strong> ကျပ်</div>
-                        <div style="color: #aaa; font-size: 12px; margin-top: 4px;">📍 ပို့ဆောင်မည့်လိပ်စာ: ${order.customer_address || '-'}</div>
-                    </div>
-                `;
-            });
-            historyList.innerHTML = html;
-
-        } catch (error) {
-            console.error('Fetch History Error:', error);
-            // Error ဆက်တက်နေရင် ဘာ Error လဲဆိုတာ စာမျက်နှာပေါ်မှာ တစ်ခါတည်း မြင်ရအောင် ပြခိုင်းထားပါတယ် အစ်ကို
-            historyList.innerHTML = `<p style="color: #ff4d4d; text-align: center; margin: 20px 0;">⚠️ Error: ${error.message || 'ဒေတာဘေ့စ် ချိတ်ဆက်မှု အဆင်မပြေပါ'}</p>`;
-        }
-    }
-
-    let currentActiveOperator = "ALL"; // အစ်ကို့ဆီက ရှိပြီးသား စာကြောင်း ဖြစ်ပါတယ်
-  
-    // 🌟 ပြင်ဆင်ပြီးချက် - ပုံနှိပ်လိုက်တာနဲ့ အရေအတွက်ကိုပါ တွက်ချက်ပြသပေးမည့် စနစ်
     function showNumbers(jsonFile, operatorName, event) {
         if(event) event.preventDefault(); 
         
@@ -967,13 +911,10 @@ async function fetchOrderHistory() {
         modal.style.display = 'flex'; 
 
         const operatorSpecificData = allNumbersData.filter(item => item.operator === operatorName);
-        
-        // 🌟 ခေါင်းစဉ်ဘေးတွင် (စုစုပေါင်း X လုံး) ဆိုပြီး ပေါ်လာအောင် ထည့်သွင်းခြင်း
         operatorCount.innerText = ` (စုစုပေါင်း ${operatorSpecificData.length} လုံး)`;
         
         renderNumbers(operatorSpecificData);
     }
-
 
     function renderNumbers(dataList) {
         const numberList = document.getElementById('numberList');
@@ -1016,7 +957,6 @@ async function fetchOrderHistory() {
         });
     }
 
-
     let searchTimeout;
 
     function performSearch(targetValue, isFromInsideModal = false) {
@@ -1038,8 +978,6 @@ async function fetchOrderHistory() {
                 operatorCount.innerText = ` (စုစုပေါင်း ${allNumbersData.length} လုံး)`;
                 renderNumbers(allNumbersData);
             }
-            document.getElementById('').value = "";
-            document.getElementById('modal').value = "";
             return;
         }
 
@@ -1088,10 +1026,9 @@ async function fetchOrderHistory() {
         if(modalId === 'numberModal') {
             document.getElementById('searchInput').value = '';
             document.getElementById('modalSearchInput').value = ''; 
-            document.getElementById('operatorCount').innerText = ''; // Reset static count text
+            document.getElementById('operatorCount').innerText = ''; 
         }
     }
-
 
     function addToCart(number, price, btnElement) {
         const isAlreadyInCart = cart.some(item => item.number === number);
@@ -1161,7 +1098,8 @@ async function fetchOrderHistory() {
         document.getElementById('checkoutModal').style.display = 'flex'; 
     }
 
-        async function confirmOrder() {
+    // 🛠️ ပြင်ဆင်ပြီးချက် - အော်ဒါတင်ချိန်တွင် ဝယ်ယူသူ၏ Email နှင့် Cart Data တစ်ခုလုံးကိုပါ သိမ်းဆည်းရန် ပြင်ဆင်ခြင်း
+    async function confirmOrder() {
         const name = document.getElementById('customerName').value.trim();
         const phone = document.getElementById('customerPhone').value.trim();
         const address = document.getElementById('customerAddress').value.trim();
@@ -1176,16 +1114,18 @@ async function fetchOrderHistory() {
         btn.disabled = true;
 
         const total = document.getElementById('cartTotal').innerText;
+        // လက်ရှိ Login ဝင်ထားတဲ့ User Email ကို ယူခြင်း (မဝင်ထားရင် guest လို့ သတ်မှတ်ပါမယ်)
+        const userEmail = currentUser ? currentUser.email : 'guest';
 
         try {
-            // ၁။ Telegram သို့ ပို့ရန် (မူလအတိုင်း)
+            // ၁။ Telegram API သို့ ပို့ခြင်း
             const response = await fetch('/api/order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, phone, address, cart, total })
             });
 
-            // ၂။ Supabase ဒေတာဘေ့စ်ထဲသို့ မှတ်တမ်းသိမ်းရန် (အသစ်ထပ်တိုးထားသည့်အပိုင်း)
+            // ၂။ Supabase ဒေတာဘေ့စ်ထဲသို့ အီးမေးလ်နှင့် Cart ပါ တစ်ခါတည်း သိမ်းဆည်းခြင်း
             const { error: dbError } = await supabaseClient
                 .from('orders')
                 .insert([
@@ -1194,6 +1134,8 @@ async function fetchOrderHistory() {
                         customer_phone: phone,
                         customer_address: address, 
                         total_price: total,
+                        cart: cart, // 👈 ရွေးချယ်ထားသော ဖုန်းနံပါတ်စာရင်းများပါ သိမ်းရန်
+                        user_email: userEmail, // 👈 ဒီကောင်လေး ပါမှ နောက်ပိုင်း အီးမေးလ်အလိုက် ပြန်စစ်ထုတ်ရလွယ်ပါမယ်
                         status: 'pending'
                     }
                 ]);
@@ -1211,7 +1153,6 @@ async function fetchOrderHistory() {
                 document.getElementById('customerPhone').value = '';
                 document.getElementById('customerAddress').value = '';
                 
-                // 🌟 အော်ဒါတင်ပြီးတာနဲ့ မှတ်တမ်းထဲ ချက်ချင်းပေါ်လာအောင် Refresh လုပ်ပေးခြင်း
                 if (currentUser) {
                     fetchOrderHistory();
                 }
@@ -1219,14 +1160,13 @@ async function fetchOrderHistory() {
                 alert("အော်ဒါတင်ရာတွင် အမှားအယွင်းဖြစ်နေပါသည်။");
             }
         } catch (error) {
-            alert("အင်တာနက် ချက်ဆက်မှု စစ်ဆေးပေးပါ။");
+            alert("အင်တာနက် ချိတ်ဆက်မှု စစ်ဆေးပေးပါ။");
             console.error(error);
         } finally {
             btn.innerText = 'အော်ဒါတင်မည်';
             btn.disabled = false;
         }
     }
-
 
     window.onclick = function(event) {
         const numberModal = document.getElementById('numberModal');
